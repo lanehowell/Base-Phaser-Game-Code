@@ -17,7 +17,7 @@ export class PreloadScene extends Phaser.Scene {
 
         const spritesPath = 'assets/sprites'
         const mapsPath = 'assets/maps'
-        const frameSize = {frameWidth: 192/4, frameHeight: 192/3}
+        const frameSize = { frameWidth: 192 / 4, frameHeight: 192 / 3 }
 
         // Load Player Assets
         this.load.spritesheet(SPRITE_KEYS.PLAYER_DOWN, `${spritesPath}/player/playerDown.png`, frameSize)
@@ -33,7 +33,7 @@ export class PreloadScene extends Phaser.Scene {
 
     create() {
 
-        this.scene.start(SCENE_KEYS.STARTING_MAP_SCENE, StartingMapScene)
+        this.scene.start(SCENE_KEYS.STARTING_MAP_SCENE, { mapId: SCENE_KEYS.STARTING_MAP_SCENE })
 
     }
 }

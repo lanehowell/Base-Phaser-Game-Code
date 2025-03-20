@@ -3,6 +3,7 @@ import { TILESET_KEYS } from "../../assets/maps/tilesets/tilesetKeys.js";
 import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js";
 import { SCENE_KEYS } from "./SceneKeys.js";
 import { ToolSystem } from "../utilityClasses/toolSystem.js";
+import playerDataService from "../gameServices/playerDataService.js";
 
 export class StartingMapScene extends Phaser.Scene {
     constructor() {
@@ -10,6 +11,22 @@ export class StartingMapScene extends Phaser.Scene {
             key: SCENE_KEYS.STARTING_MAP_SCENE
         })
 
+    }
+
+    init(data) {
+        this.mapId = data.mapId || 'world'
+
+        playerDataService.events.on('skillLevelUp', this.handleSkillLevelUp, this);
+        // playerDataService.events.on('inventoryChanged', this.updateInventoryUI, this);
+    }
+
+    handleSkillLevelUp(data) {
+        // Show level up notification
+        this.showNotification(`${data.skill} increased to level ${data.level}!`);
+    }
+
+    showNotification(message) {
+        console.log(message)
     }
 
     create() {
@@ -24,27 +41,6 @@ export class StartingMapScene extends Phaser.Scene {
         this.handleZoom()
         this.movementSpeed = 100
 
-        this.toolSystem = new ToolSystem(this)
-        const toolElement = document.createElement('div');
-        toolElement.style.position = 'absolute';
-        toolElement.style.top = '60px';
-        toolElement.style.left = '10px';
-        toolElement.style.padding = '8px 12px';
-        toolElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        toolElement.style.color = 'white';
-        toolElement.style.fontFamily = 'Arial, sans-serif';
-        toolElement.style.fontSize = '18px';
-        toolElement.style.borderRadius = '4px';
-        toolElement.style.zIndex = '1000';
-        toolElement.id = 'tool-display';
-        toolElement.innerText = 'Tool: None';
-
-        // Add the element to the document
-        document.body.appendChild(toolElement);
-
-        // Store a reference to update later
-        this.toolDisplay = toolElement;
-
         window.addEventListener('resize', () => {
             this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
             this.cameras.main.centerOn(this.player.x, this.player.y)
@@ -55,10 +51,6 @@ export class StartingMapScene extends Phaser.Scene {
     update() {
 
         this.handleMovement()
-
-        if (this.toolDisplay && this.toolSystem) {
-            this.toolDisplay.innerText = `Tool: ${this.toolSystem.getToolStatus()}`;
-        }
 
     }
 
@@ -97,7 +89,13 @@ export class StartingMapScene extends Phaser.Scene {
 
     createPlayer() {
 
-        this.player = this.physics.add.sprite(700, 700, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
+        const playerData = playerDataService.loadFromLocalStorage()
+
+        if (playerDataService.data.position.map === this.mapId) {
+            this.player = this.physics.add.sprite(playerData.position.x, playerData.position.y, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
+        } else {
+            this.player = this.physics.add.sprite(700, 700, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
+        }
 
         this.physics.add.collider(this.player, this.barriers)
 
@@ -200,6 +198,8 @@ export class StartingMapScene extends Phaser.Scene {
 
         this.player.x = Math.round(this.player.x);
         this.player.y = Math.round(this.player.y);
+
+        playerDataService.updatePosition(this.player.x, this.player.y, SCENE_KEYS.STARTING_MAP_SCENE)
 
         // Play animation based on direction
         if (direction) {
