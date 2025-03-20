@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: lightskyblue;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+}
+
+/* HEADER STYLING */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+
+    height: 50px;
+    width: 100%;
+    padding-inline: 20px;
+    background-color: white;
+
+    font-family: 'Press Start 2P', sans-serif;
+}
+
+header ul {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    height: 100%;
+}
+
+header ul li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 100%;
+}
+
+header .profile-img {
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+main {
+    display: flex;
+    align-items: center;
+    flex: 1
+}
+
+#canvas {
+    background-color: rgb(19, 19, 19);
+    width: 100%;
+    height: 100%;
+}
