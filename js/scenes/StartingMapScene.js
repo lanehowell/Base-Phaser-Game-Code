@@ -98,6 +98,7 @@ export class StartingMapScene extends Phaser.Scene {
         }
 
         this.physics.add.collider(this.player, this.barriers)
+        this.player.body.setDamping(true);
 
     }
 
