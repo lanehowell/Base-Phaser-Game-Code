@@ -5,7 +5,7 @@ class PlayerDataService {
             id: null,
             name: '',
             sprite: '',
-            position: { x: 700, y: 700, map: 'STARTING_MAP_SCENE' },
+            position: { x: 700, y: 700, direction: 'down', map: 'STARTING_MAP_SCENE' },
 
             // Stats
             health: 100,
@@ -65,8 +65,8 @@ class PlayerDataService {
         return this.data
     }
 
-    updatePosition(x, y, mapId) {
-        this.data.position = { x, y, map: mapId }
+    updatePosition(x, y, direction, mapId) {
+        this.data.position = { x, y, direction: direction || this.data.position.direction, map: mapId }
         this.dirty = true
         this.syncWithLocalStorage()
         this.events.emit('positionChanged', this.data.position)

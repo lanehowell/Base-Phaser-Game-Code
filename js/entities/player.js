@@ -5,6 +5,7 @@ export class Player {
     constructor(scene, mapId) {
         this.scene = scene
         this.sprite = null
+        this.cursors = null
         this.movementSpeed = 100
         this.mapId = mapId
         this.events = new Phaser.Events.EventEmitter()
@@ -30,6 +31,68 @@ export class Player {
 
     }
 
+    update() {
+
+        const moveInputs = {
+            up: this.cursors.up.isDown,
+            left: this.cursors.left.isDown,
+            down: this.cursors.down.isDown,
+            right: this.cursors.right.isDown
+        }
+
+        this.move(moveInputs)
+
+    }
+
+    move(input) {
+
+        let moveX = 0;
+        let moveY = 0;
+        let direction = '';
+        
+        // Process input
+        if (input.left) {
+            moveX = -1;
+            direction = 'left';
+        } else if (input.right) {
+            moveX = 1;
+            direction = 'right';
+        }
+        
+        if (input.up) {
+            moveY = -1;
+            direction = 'up';
+        } else if (input.down) {
+            moveY = 1;
+            direction = 'down';
+        }
+        
+        // Only process movement if actually moving
+        if (moveX === 0 && moveY === 0) {
+            this.sprite.setVelocity(0, 0);
+            this.sprite.anims.stop();
+            return;
+        }
+        
+        // Normalize movement
+        const movement = new Phaser.Math.Vector2(moveX, moveY).normalize();
+        
+        this.sprite.setVelocity(
+            movement.x * this.movementSpeed,
+            movement.y * this.movementSpeed
+        );
+        
+        // Play animation
+        if (direction) {
+            this.sprite.anims.play(direction, true);
+        }
+        
+        // Save position to data service
+        playerDataService.updatePosition(this.sprite.x, this.sprite.y, this.mapId)
+
+    }
+
+    // Set up animations for player sprite
     createAnimations() {
 
         const frameRate = 8
@@ -64,72 +127,19 @@ export class Player {
 
     }
 
-    setupCollisions(barriers){
-        this.scene.physics.add.collider(this.sprite, barriers)
+    // Set up keybinds for player
+    setupControls() {
+        this.cursors = this.scene.input.keyboard.addKeys({
+            up: Phaser.Input.Keyboard.KeyCodes.W,
+            left: Phaser.Input.Keyboard.KeyCodes.A,
+            down: Phaser.Input.Keyboard.KeyCodes.S,
+            right: Phaser.Input.Keyboard.KeyCodes.D,
+        })
     }
 
-    move(input) {
-        let moveX = 0;
-        let moveY = 0;
-        let direction = '';
-        
-        // Process input
-        if (input.left) {
-            moveX = -1;
-            direction = 'left';
-        } else if (input.right) {
-            moveX = 1;
-            direction = 'right';
-        }
-        
-        if (input.up) {
-            moveY = -1;
-            direction = 'up';
-        } else if (input.down) {
-            moveY = 1;
-            direction = 'down';
-        }
-        
-        // Normalize movement vector
-        const movement = new Phaser.Math.Vector2(moveX, moveY).normalize();
-        
-        // Apply velocity
-        this.sprite.setVelocity(
-            movement.x * this.movementSpeed,
-            movement.y * this.movementSpeed
-        );
-        
-        // Ensure pixel-perfect positioning
-        this.sprite.x = Math.round(this.sprite.x);
-        this.sprite.y = Math.round(this.sprite.y);
-        
-        // Update player position in service
-        if (moveX !== 0 || moveY !== 0) {
-            playerDataService.updatePosition(this.sprite.x, this.sprite.y, this.mapId);
-        }
-        
-        // Play appropriate animation
-        if (direction) {
-            this.sprite.anims.play(direction, true);
-        } else {
-            this.sprite.anims.stop();
-        }
-        
-        // Return current position for camera follow
-        return {
-            x: this.sprite.x,
-            y: this.sprite.y
-        };
-    }
-    
-    // Process input directly (alternative to move method)
-    handleInput(cursors) {
-        return this.move({
-            left: cursors.left.isDown,
-            right: cursors.right.isDown,
-            up: cursors.up.isDown,
-            down: cursors.down.isDown
-        });
+    // Add collions for any barriers on the map
+    setupCollisions(barriers){
+        this.scene.physics.add.collider(this.sprite, barriers)
     }
     
     getPosition() {
