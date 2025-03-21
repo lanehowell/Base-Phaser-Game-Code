@@ -60,8 +60,6 @@ export class StartingMapScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: MAP_KEYS.STARTING_MAP, tileHeight: 16, tileWidth: 16 });
 
         const beach_tiles = this.map.addTilesetImage('beach_tiles', TILESET_KEYS.BEACH_TILESET);
-        console.log("Available tiles:", beach_tiles)
-
         const water_layer = this.map.createLayer('Water Layer', beach_tiles, 0, 0);
         this.ground_layer = this.map.createLayer('Ground Layer', beach_tiles, 0, 0);
         this.ground_layer.setInteractive()
@@ -90,8 +88,8 @@ export class StartingMapScene extends Phaser.Scene {
     createPlayer() {
 
         const playerData = playerDataService.loadFromLocalStorage()
-
-        if (playerDataService.data.position.map === this.mapId) {
+    
+        if (playerData && playerData.position && playerData.position.map === this.mapId) {
             this.player = this.physics.add.sprite(playerData.position.x, playerData.position.y, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
         } else {
             this.player = this.physics.add.sprite(700, 700, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)

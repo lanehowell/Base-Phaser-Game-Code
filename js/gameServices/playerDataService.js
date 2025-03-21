@@ -4,6 +4,7 @@ class PlayerDataService {
             // Basic Info
             id: null,
             name: '',
+            sprite: '',
             position: { x: 700, y: 700, map: 'STARTING_MAP_SCENE' },
 
             // Stats
@@ -32,7 +33,12 @@ class PlayerDataService {
                 fishing: { level: 1, exp: 0 },
                 breeding: { level: 1, exp: 0 },
                 catching: { level: 1, exp: 0 },
-            }
+            },
+
+            // Meta Data
+            lastMessage: '',
+            lastAction: '',
+            itemInHand: null
         }
 
         // To track if data needs to be synced
@@ -50,7 +56,13 @@ class PlayerDataService {
     }
 
     loadFromLocalStorage() {
-        return this.data = JSON.parse(localStorage.getItem('playerData'))
+        const savedData = localStorage.getItem('playerData')
+
+        if(savedData){
+            this.data = JSON.parse(savedData)
+        }
+
+        return this.data
     }
 
     updatePosition(x, y, mapId) {
