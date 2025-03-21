@@ -4,6 +4,7 @@ import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js";
 import { SCENE_KEYS } from "./SceneKeys.js";
 import { ToolSystem } from "../utilityClasses/toolSystem.js";
 import playerDataService from "../gameServices/playerDataService.js";
+import { Player } from "../entities/player.js";
 
 export class StartingMapScene extends Phaser.Scene {
     constructor() {
@@ -35,7 +36,6 @@ export class StartingMapScene extends Phaser.Scene {
         this.createMap()
         this.createPlayer()
         this.createMovement()
-        this.createAnimations()
         this.createCamera()
         // this.handleClicks()
         this.handleZoom()
@@ -43,7 +43,7 @@ export class StartingMapScene extends Phaser.Scene {
 
         window.addEventListener('resize', () => {
             this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-            this.cameras.main.centerOn(this.player.x, this.player.y)
+            this.cameras.main.centerOn(this.player.getSprite().x, this.player.getSprite().y)
         })
 
     }
@@ -87,50 +87,9 @@ export class StartingMapScene extends Phaser.Scene {
 
     createPlayer() {
 
-        const playerData = playerDataService.loadFromLocalStorage()
-    
-        if (playerData && playerData.position && playerData.position.map === this.mapId) {
-            this.player = this.physics.add.sprite(playerData.position.x, playerData.position.y, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
-        } else {
-            this.player = this.physics.add.sprite(700, 700, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
-        }
+        this.player = new Player(this, this.mapId)
 
-        this.physics.add.collider(this.player, this.barriers)
-        this.player.body.setDamping(true);
-
-    }
-
-    createAnimations() {
-
-        const frameRate = 8
-
-        this.anims.create({
-            key: 'down',
-            frames: this.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_DOWN, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'up',
-            frames: this.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_UP, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'left',
-            frames: this.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_LEFT, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'right',
-            frames: this.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_RIGHT, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        });
+        this.player.setupCollisions(this.barriers)
 
     }
 
@@ -164,48 +123,7 @@ export class StartingMapScene extends Phaser.Scene {
 
     handleMovement() {
 
-        let moveX = 0
-        let moveY = 0
-        let direction = ''
-
-        // @ts-ignore
-        if (this.cursors.left.isDown) {
-            moveX = -1
-            direction = 'left'
-            // @ts-ignore
-        } else if (this.cursors.right.isDown) {
-            moveX = 1
-            direction = 'right'
-        }
-
-        // @ts-ignore
-        if (this.cursors.up.isDown) {
-            moveY = -1
-            direction = 'up'
-            // @ts-ignore
-        } else if (this.cursors.down.isDown) {
-            moveY = 1
-            direction = 'down'
-        }
-
-        const movement = new Phaser.Math.Vector2(moveX, moveY).normalize()
-
-        this.player.setVelocity(
-            movement.x * this.movementSpeed,
-            movement.y * this.movementSpeed
-        )
-
-        this.player.x = Math.round(this.player.x);
-        this.player.y = Math.round(this.player.y);
-
-        playerDataService.updatePosition(this.player.x, this.player.y, SCENE_KEYS.STARTING_MAP_SCENE)
-
-        // Play animation based on direction
-        if (direction) {
-            this.player.anims.play(direction, true)
-        } else {
-            this.player.anims.stop()
-        }
+        this.player.handleInput(this.cursors)
 
         // Smoother Camera Movement
         const effectiveCameraSmoothing = this.cameraSmoothing
@@ -246,5 +164,9 @@ export class StartingMapScene extends Phaser.Scene {
                 }
             }
         })
+    }
+
+    shutdown() {
+        playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this);
     }
 }

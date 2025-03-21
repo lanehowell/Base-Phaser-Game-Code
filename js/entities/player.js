@@ -1,0 +1,163 @@
+import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js";
+import playerDataService from "../gameServices/playerDataService.js";
+
+export class Player {
+    constructor(scene, mapId) {
+        this.scene = scene
+        this.sprite = null
+        this.movementSpeed = 100
+        this.mapId = mapId
+        this.events = new Phaser.Events.EventEmitter()
+
+        this.init()
+    }
+
+    init() {
+
+        const playerData = playerDataService.loadFromLocalStorage()
+
+        if(playerDataService.data && playerDataService.data.position.map === this.mapId) {
+            console.log('loading exisiting player data')
+            this.sprite = this.scene.physics.add.sprite(playerData.position.x, playerData.position.y, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
+        } else {
+            console.log('creating new player data')
+            this.sprite = this.scene.physics.add.sprite(700, 700, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
+        }
+
+        this.sprite.body.setDamping(true)
+
+        this.createAnimations()
+
+    }
+
+    createAnimations() {
+
+        const frameRate = 8
+
+        this.scene.anims.create({
+            key: 'down',
+            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_DOWN, { start: 0, end: 3 }),
+            frameRate: frameRate,
+            repeat: -1,
+        })
+
+        this.scene.anims.create({
+            key: 'up',
+            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_UP, { start: 0, end: 3 }),
+            frameRate: frameRate,
+            repeat: -1,
+        })
+
+        this.scene.anims.create({
+            key: 'left',
+            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_LEFT, { start: 0, end: 3 }),
+            frameRate: frameRate,
+            repeat: -1,
+        })
+
+        this.scene.anims.create({
+            key: 'right',
+            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_RIGHT, { start: 0, end: 3 }),
+            frameRate: frameRate,
+            repeat: -1,
+        })
+
+    }
+
+    setupCollisions(barriers){
+        this.scene.physics.add.collider(this.sprite, barriers)
+    }
+
+    move(input) {
+        let moveX = 0;
+        let moveY = 0;
+        let direction = '';
+        
+        // Process input
+        if (input.left) {
+            moveX = -1;
+            direction = 'left';
+        } else if (input.right) {
+            moveX = 1;
+            direction = 'right';
+        }
+        
+        if (input.up) {
+            moveY = -1;
+            direction = 'up';
+        } else if (input.down) {
+            moveY = 1;
+            direction = 'down';
+        }
+        
+        // Normalize movement vector
+        const movement = new Phaser.Math.Vector2(moveX, moveY).normalize();
+        
+        // Apply velocity
+        this.sprite.setVelocity(
+            movement.x * this.movementSpeed,
+            movement.y * this.movementSpeed
+        );
+        
+        // Ensure pixel-perfect positioning
+        this.sprite.x = Math.round(this.sprite.x);
+        this.sprite.y = Math.round(this.sprite.y);
+        
+        // Update player position in service
+        if (moveX !== 0 || moveY !== 0) {
+            playerDataService.updatePosition(this.sprite.x, this.sprite.y, this.mapId);
+        }
+        
+        // Play appropriate animation
+        if (direction) {
+            this.sprite.anims.play(direction, true);
+        } else {
+            this.sprite.anims.stop();
+        }
+        
+        // Return current position for camera follow
+        return {
+            x: this.sprite.x,
+            y: this.sprite.y
+        };
+    }
+    
+    // Process input directly (alternative to move method)
+    handleInput(cursors) {
+        return this.move({
+            left: cursors.left.isDown,
+            right: cursors.right.isDown,
+            up: cursors.up.isDown,
+            down: cursors.down.isDown
+        });
+    }
+    
+    getPosition() {
+        return {
+            x: this.sprite.x,
+            y: this.sprite.y
+        };
+    }
+    
+    setPosition(x, y) {
+        this.sprite.x = x;
+        this.sprite.y = y;
+        return this;
+    }
+    
+    getSprite() {
+        return this.sprite;
+    }
+    
+    setMovementSpeed(speed) {
+        this.movementSpeed = speed;
+        return this;
+    }
+    
+    destroy() {
+        if (this.sprite) {
+            this.sprite.destroy();
+        }
+    }
+
+}
