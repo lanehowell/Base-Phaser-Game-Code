@@ -7,6 +7,7 @@ export class Player {
         this.sprite = null
         this.cursors = null
         this.movementSpeed = 100
+        this.direction = 'down'
         this.mapId = mapId
         this.events = new Phaser.Events.EventEmitter()
 
@@ -19,7 +20,7 @@ export class Player {
 
         if(playerDataService.data && playerDataService.data.position.map === this.mapId) {
             console.log('loading exisiting player data')
-            this.sprite = this.scene.physics.add.sprite(playerData.position.x, playerData.position.y, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
+            this.sprite = this.scene.physics.add.sprite(playerData.position.x, playerData.position.y, `PLAYER_${playerData.position.direction.toUpperCase()}`).setScale(.5)
         } else {
             console.log('creating new player data')
             this.sprite = this.scene.physics.add.sprite(700, 700, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
@@ -42,53 +43,63 @@ export class Player {
 
         this.move(moveInputs)
 
+        this.sprite.x = Math.round(this.sprite.x)
+        this.sprite.y = Math.round(this.sprite.y)
+
     }
 
     move(input) {
 
-        let moveX = 0;
-        let moveY = 0;
-        let direction = '';
+        let moveX = 0
+        let moveY = 0
+        let direction = ''
         
         // Process input
         if (input.left) {
-            moveX = -1;
-            direction = 'left';
+            moveX = -1
+            direction = 'left'
         } else if (input.right) {
-            moveX = 1;
-            direction = 'right';
+            moveX = 1
+            direction = 'right'
         }
         
         if (input.up) {
-            moveY = -1;
-            direction = 'up';
+            moveY = -1
+            direction = 'up'
         } else if (input.down) {
-            moveY = 1;
-            direction = 'down';
+            moveY = 1
+            direction = 'down'
         }
         
         // Only process movement if actually moving
         if (moveX === 0 && moveY === 0) {
-            this.sprite.setVelocity(0, 0);
-            this.sprite.anims.stop();
-            return;
+            this.sprite.setVelocity(0, 0)
+            this.sprite.anims.stop()
+            return
         }
         
         // Normalize movement
-        const movement = new Phaser.Math.Vector2(moveX, moveY).normalize();
+        const movement = new Phaser.Math.Vector2(moveX, moveY).normalize()
         
-        this.sprite.setVelocity(
-            movement.x * this.movementSpeed,
-            movement.y * this.movementSpeed
-        );
+        // Calculate the velocity
+        const velocityX = movement.x * this.movementSpeed
+        const velocityY = movement.y * this.movementSpeed
+        
+        // Set the velocity directly
+        this.sprite.setVelocity(velocityX, velocityY)
         
         // Play animation
         if (direction) {
-            this.sprite.anims.play(direction, true);
+            this.sprite.anims.play(direction, true)
         }
         
         // Save position to data service
-        playerDataService.updatePosition(this.sprite.x, this.sprite.y, this.mapId)
+        playerDataService.updatePosition(
+            Math.round(this.sprite.x), 
+            Math.round(this.sprite.y), 
+            direction || undefined, 
+            this.mapId
+        )
 
     }
 
@@ -157,11 +168,6 @@ export class Player {
     
     getSprite() {
         return this.sprite;
-    }
-    
-    setMovementSpeed(speed) {
-        this.movementSpeed = speed;
-        return this;
     }
     
     destroy() {

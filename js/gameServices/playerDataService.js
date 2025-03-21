@@ -1,3 +1,5 @@
+import networkService from "./networkService.js"
+
 class PlayerDataService {
     constructor() {
         this.data = {
@@ -47,6 +49,21 @@ class PlayerDataService {
         // Communicate events across scenes
         this.events = new Phaser.Events.EventEmitter()
 
+        this.lastServerSync = 0;
+        this.serverSyncInterval = 500;
+
+        this.syncWithServer = () =>{
+            const now = Date.now();
+            if (networkService.isConnected && now - this.lastServerSync >= this.serverSyncInterval) {
+                networkService.sendPlayerData(this.data);
+                this.lastServerSync = now;
+            }
+        }
+
+        // networkService.events.on('connected', () =>{
+        //     this.syncWithServer()
+        // })
+
     }
 
     syncWithLocalStorage() {
@@ -69,6 +86,7 @@ class PlayerDataService {
         this.data.position = { x, y, direction: direction || this.data.position.direction, map: mapId }
         this.dirty = true
         this.syncWithLocalStorage()
+        this.syncWithServer()
         this.events.emit('positionChanged', this.data.position)
     }
 

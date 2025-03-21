@@ -92,7 +92,9 @@ export class StartingMapScene extends BaseScene {
         this.cameraZoom = 2
         this.cameraMinZoom = 1.5
         this.cameraMaxZoom = 4
-        this.cameras.main.startFollow(this.player.getSprite(), true)
+
+        this.cameras.main.startFollow(this.player.getSprite(), true, 0.1, 0.1);
+        this.cameras.main.roundPixels = true; // This helps keep pixel art clean
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.setZoom(this.cameraZoom)
         this.targetPosition = new Phaser.Math.Vector2()
