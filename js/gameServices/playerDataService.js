@@ -4,7 +4,7 @@ class PlayerDataService {
     constructor() {
         this.data = {
             // Basic Info
-            id: null,
+            id: Math.floor(Math.random()*100),
             name: '',
             sprite: '',
             position: { x: 700, y: 700, direction: 'down', map: 'STARTING_MAP_SCENE' },
@@ -57,6 +57,7 @@ class PlayerDataService {
             if (networkService.isConnected && now - this.lastServerSync >= this.serverSyncInterval) {
                 networkService.sendPlayerData(this.data);
                 this.lastServerSync = now;
+                console.log(this.data)
             }
         }
 

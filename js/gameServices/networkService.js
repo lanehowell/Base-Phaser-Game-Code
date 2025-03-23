@@ -4,6 +4,8 @@ class NetworkService {
         this.isConnected = false,
         this.reconnectInterval = null,
         this.serverURL = 'wss://pine.candl.pro:443/ws/testsocket'
+
+        this.events = new Phaser.Events.EventEmitter()
     }
 
     connect() {
@@ -90,6 +92,12 @@ class NetworkService {
     handleMessage(message) {
         console.log(`WebSocket Message Received: `, message)
 
+        this.events.emit('message', message)
+
+        if(message && message.p){
+            this.events.emit(`message: ${message.p}, ${message.d}`)
+        }
+
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
 
     }
@@ -101,17 +109,18 @@ class NetworkService {
             return false;
         }
 
+        console.log(playerData)
+
         try {
             const message = JSON.stringify({
                 p: "position",
-                d: [playerData.position.x]
+                d: [playerData.id, playerData.position]
             })
 
             this.socket.send(message)
 
             console.log(message)
             
-            console.log("Player data sent to server")
             return true
         } catch (error) {
             console.error("Error sending player data:", error)

@@ -10,6 +10,7 @@ export class Player {
         this.direction = 'down'
         this.mapId = mapId
         this.events = new Phaser.Events.EventEmitter()
+        this.id = playerDataService.data.id
 
         this.init()
     }
