@@ -7,7 +7,7 @@ class PlayerDataService {
             id: Math.floor(Math.random()*100),
             name: '',
             sprite: '',
-            position: { x: 700, y: 700, direction: 'down', map: 'STARTING_MAP_SCENE' },
+            position: { x: 700, y: 700, direction: 'down', map: 'STARTING_MAP' },
 
             // Stats
             health: 100,
@@ -56,8 +56,9 @@ class PlayerDataService {
             const now = Date.now();
             if (networkService.isConnected && now - this.lastServerSync >= this.serverSyncInterval) {
                 networkService.sendPlayerData(this.data);
-                this.lastServerSync = now;
+                console.log("Attempting sync")
                 console.log(this.data)
+                this.lastServerSync = now;
             }
         }
 

@@ -4,13 +4,13 @@ import { MAP_KEYS } from "../../assets/maps/mapKeys.js";
 import { TILESET_KEYS } from "../../assets/maps/tilesets/tilesetKeys.js";
 import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js";
 import { SCENE_KEYS } from "./SceneKeys.js";
-import { StartingMapScene } from "./StartingMapScene.js";
 
-export class PreloadScene extends Phaser.Scene {
-    constructor() {
+export class PreloadScene extends Phaser.Scene {    
+    constructor(map) {
         super({
             key: SCENE_KEYS.PRELOAD_SCENE
         })
+        this.map = map
     }
 
     preload() {
@@ -27,8 +27,9 @@ export class PreloadScene extends Phaser.Scene {
 
         // Load Map Assets
         this.load.image(TILESET_KEYS.BEACH_TILESET, `${mapsPath}/tilesets/beach_tiles.png`)
-        this.load.tilemapTiledJSON(MAP_KEYS.STARTING_MAP, `${mapsPath}/map.json`)
-
+        console.log(this.map)
+        console.log("1111111111111111111111111111111")
+        this.load.tilemapTiledJSON(MAP_KEYS.STARTING_MAP, this.map)
     }
 
     create() {

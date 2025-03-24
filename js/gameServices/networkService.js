@@ -3,8 +3,7 @@ class NetworkService {
         this.socket = null,
         this.isConnected = false,
         this.reconnectInterval = null,
-        this.serverURL = 'wss://pine.candl.pro:443/ws/testsocket'
-
+        this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=ffe6eafb5cace8f1f5c71b7366605bffc601757d'
         this.events = new Phaser.Events.EventEmitter()
     }
 
@@ -99,7 +98,10 @@ class NetworkService {
         }
 
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
-
+        if(message.p == "map"){
+            this.map = message.d
+            console.log("MAP CHANGED"+this.map)
+        }
     }
 
     sendPlayerData(playerData) {
@@ -109,17 +111,14 @@ class NetworkService {
             return false;
         }
 
-        console.log(playerData)
-
         try {
             const message = JSON.stringify({
                 p: "position",
-                d: [playerData.id, playerData.position]
+                d: [playerData.position.x, playerData.position.y, playerData.position.direction, playerData.position.map]
             })
-
+            console.log(message)
             this.socket.send(message)
 
-            console.log(message)
             
             return true
         } catch (error) {
