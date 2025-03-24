@@ -17,7 +17,8 @@ export class Player {
 
     init() {
 
-        const playerData = playerDataService.loadFromLocalStorage()
+        const playerData = playerDataService.data
+        console.log(playerData)
 
         if(playerDataService.data && playerDataService.data.position.map === this.mapId) {
             console.log('loading exisiting player data')
@@ -96,6 +97,7 @@ export class Player {
         
         // Save position to data service
         playerDataService.updatePosition(
+            playerDataService.data.id,
             Math.round(this.sprite.x), 
             Math.round(this.sprite.y), 
             direction || undefined, 

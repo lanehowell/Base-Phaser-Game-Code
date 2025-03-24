@@ -31,12 +31,14 @@ export class StartingMapScene extends BaseScene {
 
     create() {
 
+        console.log(playerDataService.data)
+
         this.scene.launch(SCENE_KEYS.UI_SCENE)
 
         this.input.mouse.disableContextMenu()
         this.createMap()
 
-        this.createPlayer()
+        this.createPlayer(MAP_KEYS.STARTING_MAP)
 
         this.createCamera()
         // this.handleClicks()

@@ -27,12 +27,11 @@ export class PreloadScene extends Phaser.Scene {
 
         // Load Map Assets
         this.load.image(TILESET_KEYS.BEACH_TILESET, `${mapsPath}/tilesets/beach_tiles.png`)
-        console.log(this.map)
-        console.log("1111111111111111111111111111111")
         this.load.tilemapTiledJSON(MAP_KEYS.STARTING_MAP, this.map)
 
         // Load UI Elements
         this.load.image('UIHeart', 'assets/ui/heart.png')
+        this.load.image('UIEnergy', 'assets/ui/energy.png')
     }
 
     create() {

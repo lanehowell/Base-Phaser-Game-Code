@@ -1,13 +1,14 @@
+import { SCENE_KEYS } from "../scenes/SceneKeys.js";
 import networkService from "./networkService.js"
 
 class PlayerDataService {
     constructor() {
         this.data = {
             // Basic Info
-            id: Math.floor(Math.random()*100),
+            id: null,
             name: '',
             sprite: '',
-            position: { x: 700, y: 700, direction: 'down', map: 'STARTING_MAP' },
+            position: { x: 700, y: 700, direction: 'down', map: SCENE_KEYS.STARTING_MAP_SCENE },
 
             // Stats
             health: 100,
@@ -57,37 +58,31 @@ class PlayerDataService {
             if (networkService.isConnected && now - this.lastServerSync >= this.serverSyncInterval) {
                 networkService.sendPlayerData(this.data);
                 console.log("Attempting sync")
-                console.log(this.data)
+                console.log(this.data.position)
                 this.lastServerSync = now;
             }
         }
 
-        // networkService.events.on('connected', () =>{
-        //     this.syncWithServer()
-        // })
+        networkService.events.on('playerDataReceived', (data) => {
+            this.updateFromServer(data)
+        })
 
     }
 
-    syncWithLocalStorage() {
-        if (this.dirty) {
-            localStorage.setItem('playerData', JSON.stringify(this.data))
+    updateFromServer(serverData) {
+        if (serverData) {
+            // Merge server data with local data
+            this.data = {...this.data, ...serverData};
+            this.dirty = false;
+            
+            // Emit event for other components to react
+            this.events.emit('playerDataUpdated', this.data);
         }
     }
 
-    loadFromLocalStorage() {
-        const savedData = localStorage.getItem('playerData')
-
-        if(savedData){
-            this.data = JSON.parse(savedData)
-        }
-
-        return this.data
-    }
-
-    updatePosition(x, y, direction, mapId) {
-        this.data.position = { x, y, direction: direction || this.data.position.direction, map: mapId }
+    updatePosition(id, x, y, direction, mapId) {
+        this.data.position = {id, x, y, direction: direction || this.data.position.direction, map: mapId }
         this.dirty = true
-        this.syncWithLocalStorage()
         this.syncWithServer()
         this.events.emit('positionChanged', this.data.position)
     }
