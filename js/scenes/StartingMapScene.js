@@ -31,6 +31,8 @@ export class StartingMapScene extends BaseScene {
 
     create() {
 
+        this.scene.launch(SCENE_KEYS.UI_SCENE)
+
         this.input.mouse.disableContextMenu()
         this.createMap()
 
