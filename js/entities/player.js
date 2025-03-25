@@ -18,10 +18,10 @@ export class Player {
     init() {
 
         const playerData = playerDataService.data
-        console.log(playerData)
-
+        
         if(playerDataService.data && playerDataService.data.position.map === this.mapId) {
             console.log('loading exisiting player data')
+            console.log(playerData.position.x, playerData.position.y)
             this.sprite = this.scene.physics.add.sprite(playerData.position.x, playerData.position.y, `PLAYER_${playerData.position.direction.toUpperCase()}`).setScale(.5)
         } else {
             console.log('creating new player data')
@@ -97,7 +97,6 @@ export class Player {
         
         // Save position to data service
         playerDataService.updatePosition(
-            playerDataService.data.id,
             Math.round(this.sprite.x), 
             Math.round(this.sprite.y), 
             direction || undefined, 

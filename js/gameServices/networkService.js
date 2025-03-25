@@ -108,6 +108,13 @@ class NetworkService {
                 this.events.emit('playerDataReceived', message.d)
                 console.log("PLAYER DATA RECEIVED", message.d)
                 break
+            case 'player':
+                this.events.emit('playerJoined', message.d)
+                console.log("Player Joined", message.d)
+                break
+            case 'position':
+                this.events.emit('playerMoved', message.d)
+                console.log('Player Moved: ', message.d)
         }
 
     }
