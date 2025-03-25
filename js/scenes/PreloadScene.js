@@ -36,7 +36,7 @@ export class PreloadScene extends Phaser.Scene {
 
     create() {
 
-        this.scene.start(SCENE_KEYS.STARTING_MAP_SCENE, { mapId: SCENE_KEYS.STARTING_MAP_SCENE })
+        this.scene.start(SCENE_KEYS.STARTING_MAP_SCENE, { mapId: MAP_KEYS.STARTING_MAP })
 
     }
 }

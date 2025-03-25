@@ -4,7 +4,7 @@ import { SCENE_KEYS } from "./SceneKeys.js";
 import { ToolSystem } from "../utilityClasses/toolSystem.js";
 import playerDataService from "../gameServices/playerDataService.js";
 import { BaseScene } from "./baseScene.js";
-import { NetworkPlayerManager } from "../gameServices/networkPlayerManager.js";
+// import { NetworkPlayerManager } from "../gameServices/networkPlayerManager.js";
 
 export class StartingMapScene extends BaseScene {
     constructor() {
@@ -38,7 +38,7 @@ export class StartingMapScene extends BaseScene {
         this.createMap()
 
         this.createPlayer(MAP_KEYS.STARTING_MAP)
-        this.networkPlayerManager = new NetworkPlayerManager(this)
+        // this.networkPlayerManager = new NetworkPlayerManager(this)
 
         this.createCamera()
         // this.handleClicks()
@@ -58,9 +58,9 @@ export class StartingMapScene extends BaseScene {
             this.player.update()
         }
 
-        if(this.networkPlayerManager){
-            this.networkPlayerManager.update()
-        }
+        // if(this.networkPlayerManager){
+        //     this.networkPlayerManager.update()
+        // }
 
     }
 
