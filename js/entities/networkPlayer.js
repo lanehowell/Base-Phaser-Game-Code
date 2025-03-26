@@ -7,6 +7,7 @@ export class NetworkPlayer {
     this.sprite = null
     this.direction = direction || 'down'
     this.name = name
+    this.currentTween = null
 
     this.init(x, y)
   }
@@ -23,35 +24,40 @@ export class NetworkPlayer {
 
   createAnimations() {
   
-          const frameRate = 8
-  
-          this.scene.anims.create({
-              key: 'down',
-              frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_DOWN, { start: 0, end: 3 }),
-              frameRate: frameRate,
-              repeat: -1,
-          })
-  
-          this.scene.anims.create({
-              key: 'up',
-              frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_UP, { start: 0, end: 3 }),
-              frameRate: frameRate,
-              repeat: -1,
-          })
-  
-          this.scene.anims.create({
-              key: 'left',
-              frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_LEFT, { start: 0, end: 3 }),
-              frameRate: frameRate,
-              repeat: -1,
-          })
-  
-          this.scene.anims.create({
-              key: 'right',
-              frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_RIGHT, { start: 0, end: 3 }),
-              frameRate: frameRate,
-              repeat: -1,
-          })
+    const frameRate = 8
+
+    if(!this.scene.anims.exists('down')){
+      this.scene.anims.create({
+        key: 'down',
+        frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_DOWN, { start: 0, end: 3 }),
+        frameRate: frameRate,
+        repeat: -1,
+    })
+    }
+    if(!this.scene.anims.exists('up')){
+      this.scene.anims.create({
+        key: 'up',
+        frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_UP, { start: 0, end: 3 }),
+        frameRate: frameRate,
+        repeat: -1,
+    })
+    }
+    if(!this.scene.anims.exists('left')){
+      this.scene.anims.create({
+        key: 'left',
+        frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_LEFT, { start: 0, end: 3 }),
+        frameRate: frameRate,
+        repeat: -1,
+    })
+    }
+    if(!this.scene.anims.exists('right')){
+      this.scene.anims.create({
+        key: 'right',
+        frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_RIGHT, { start: 0, end: 3 }),
+        frameRate: frameRate,
+        repeat: -1,
+    })
+    }
   
   }
   
@@ -77,20 +83,13 @@ export class NetworkPlayer {
       this.sprite.setTexture(`PLAYER_${direction.toUpperCase()}`)
     }
 
-    this.playAnimation()
     this.updateNameTagPosition()
 
   }
 
-  createNameTag(name) {
+  createNameTag() {
 
-    this.nameTag = this.scene.add.text(0, 0, this.name, {
-      font: '10px Arial',
-      fill: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 2,
-      align: 'center'
-    }).setOrigin(0.5, 1)
+    this.nameTag = this.scene.add.bitmapText(0, 0, 'Pixeled', this.name, 8).setOrigin(0.5, 1)
 
     this.updateNameTagPosition()
 
@@ -98,8 +97,8 @@ export class NetworkPlayer {
 
   updateNameTagPosition() {
 
-    this.nameTag.x = this.sprite.x
-    this.nameTag.y = this.sprite.y - (this.sprite.height * 0.5)
+    this.nameTag.x = Math.floor(this.sprite.x)
+    this.nameTag.y = Math.floor(this.sprite.y - (this.sprite.height * 0.3))
 
   }
 
@@ -112,6 +111,7 @@ export class NetworkPlayer {
   destroy() {
 
     this.sprite.destroy()
+    this.nameTag.destroy()
 
   }
 

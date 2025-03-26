@@ -4,6 +4,13 @@
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: 'Pixeled';
+    src: url('assets/fonts/Pixeled.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
 body {
     display: flex;
     flex-direction: column;

@@ -14,6 +14,7 @@ export class NetworkPlayerManager {
   setupNetworkListeners() {
 
     networkService.events.on('playerJoined', (playerData) =>{
+      console.log("EVENT RECEIVED")
       this.handlePlayerJoined(playerData)
     })
 
@@ -57,7 +58,6 @@ export class NetworkPlayerManager {
     }
 
     const player = this.players.get(position.id)
-    console.log(player)
     if(player){
       player.updatePosition(position.x, position.y, position.direction)
       player.playAnimation()
@@ -82,15 +82,15 @@ export class NetworkPlayerManager {
     if(this.players.has(playerId)) {
       console.log(`Player Left: ${playerId}`)
       const player = this.players.get(playerId)
+      player.destroy()
       this.players.delete(playerId)
-      console.log(this.players)
     }
 
   }
 
   update() {
 
-
+    
 
   }
 }

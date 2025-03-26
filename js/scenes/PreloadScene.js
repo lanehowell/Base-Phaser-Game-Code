@@ -32,6 +32,10 @@ export class PreloadScene extends Phaser.Scene {
         // Load UI Elements
         this.load.image('UIHeart', 'assets/ui/heart.png')
         this.load.image('UIEnergy', 'assets/ui/energy.png')
+
+        // Load Bitmap Fonts
+        this.load.bitmapFont('Pixeled', 'assets/fonts/thick.png', 'assets/fonts/thick.xml')
+
     }
 
     create() {

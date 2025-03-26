@@ -13,7 +13,7 @@ class PlayerDataService {
         this.events = new Phaser.Events.EventEmitter()
 
         this.lastServerSync = 0;
-        this.serverSyncInterval = 45;
+        this.serverSyncInterval = 50;
 
         this.syncWithServer = () =>{
             const now = Date.now();

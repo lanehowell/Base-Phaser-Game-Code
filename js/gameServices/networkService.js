@@ -89,7 +89,7 @@ class NetworkService {
     }
 
     handleMessage(message) {
-        console.log(`WebSocket Message Received: `, message)
+        // console.log(`WebSocket Message Received: `, message)
 
         this.events.emit('message', message)
 
@@ -113,8 +113,10 @@ class NetworkService {
             case 'position':
                 this.events.emit('playerMoved', message.d)
                 // console.log('Player Moved: ', message.d)
+                break
             case 'disconnect':
                 this.events.emit('playerLeft', message.d)
+                break
         }
 
     }
