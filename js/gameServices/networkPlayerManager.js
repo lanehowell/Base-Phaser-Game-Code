@@ -83,6 +83,7 @@ export class NetworkPlayerManager {
       console.log(`Player Left: ${playerId}`)
       const player = this.players.get(playerId)
       this.players.delete(playerId)
+      console.log(this.players)
     }
 
   }

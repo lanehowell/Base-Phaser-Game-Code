@@ -3,7 +3,7 @@ class NetworkService {
         this.socket = null,
         this.isConnected = false,
         this.reconnectInterval = null,
-        this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=be56a9da6da6ced7f880ffaaa9044d3b9ad767cf'
+        this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=0a991b49bd67c74035caba2d0c8850261746461e'
         this.events = new Phaser.Events.EventEmitter()
     }
 
@@ -89,7 +89,7 @@ class NetworkService {
     }
 
     handleMessage(message) {
-        // console.log(`WebSocket Message Received: `, message)
+        console.log(`WebSocket Message Received: `, message)
 
         this.events.emit('message', message)
 
@@ -113,6 +113,8 @@ class NetworkService {
             case 'position':
                 this.events.emit('playerMoved', message.d)
                 // console.log('Player Moved: ', message.d)
+            case 'disconnect':
+                this.events.emit('playerLeft', message.d)
         }
 
     }
