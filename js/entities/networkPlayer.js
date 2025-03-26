@@ -1,11 +1,12 @@
 import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js"
 
 export class NetworkPlayer {
-  constructor(scene, id, x, y, direction) {
+  constructor(scene, id, x, y, direction, name) {
     this.scene = scene
     this.id = id
     this.sprite = null
     this.direction = direction || 'down'
+    this.name = name
 
     this.init(x, y)
   }
@@ -13,6 +14,8 @@ export class NetworkPlayer {
   init(x, y) {
   
     this.sprite = this.scene.physics.add.sprite(x, y, `PLAYER_${this.direction.toUpperCase()}`).setScale(0.5)
+
+    this.createNameTag()
 
     this.createAnimations()
 
@@ -75,6 +78,28 @@ export class NetworkPlayer {
     }
 
     this.playAnimation()
+    this.updateNameTagPosition()
+
+  }
+
+  createNameTag(name) {
+
+    this.nameTag = this.scene.add.text(0, 0, this.name, {
+      font: '10px Arial',
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 2,
+      align: 'center'
+    }).setOrigin(0.5, 1)
+
+    this.updateNameTagPosition()
+
+  }
+
+  updateNameTagPosition() {
+
+    this.nameTag.x = this.sprite.x
+    this.nameTag.y = this.sprite.y - (this.sprite.height * 0.5)
 
   }
 

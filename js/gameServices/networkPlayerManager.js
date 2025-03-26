@@ -41,7 +41,8 @@ export class NetworkPlayerManager {
         playerData.id,
         playerData.position.x,
         playerData.position.y,
-        playerData.position.direction
+        playerData.position.direction,
+        playerData.name
       )
 
       this.players.set(playerData.id, player)
@@ -61,12 +62,14 @@ export class NetworkPlayerManager {
       player.updatePosition(position.x, position.y, position.direction)
       player.playAnimation()
     } else {
+        console.log(position)
         const player = new NetworkPlayer(
             this.scene,
             position.id,
-            position.position.x,
-            position.position.y,
-            position.position.direction
+            position.x,
+            position.y,
+            position.direction,
+            position.id
         )
       
         this.players.set(position.id, player)
