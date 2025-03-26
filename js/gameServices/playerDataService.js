@@ -13,15 +13,14 @@ class PlayerDataService {
         this.events = new Phaser.Events.EventEmitter()
 
         this.lastServerSync = 0;
-        this.serverSyncInterval = 300;
+        this.serverSyncInterval = 45;
 
         this.syncWithServer = () =>{
             const now = Date.now();
             if (networkService.isConnected && now - this.lastServerSync >= this.serverSyncInterval) {
-                networkService.sendPlayerData(this.data);
-                console.log("Attempting sync")
-                console.log(this.data.position)
-                this.lastServerSync = now;
+                networkService.sendPlayerData(this.data)
+                console.log("Attempting sync: ", this.data.position)
+                this.lastServerSync = now
             }
         }
 
@@ -33,12 +32,12 @@ class PlayerDataService {
 
     updateFromServer(serverData) {
         if (serverData) {
-            // Merge server data with local data
-            this.data = {...this.data, ...serverData};
-            this.dirty = false;
+            this.data = serverData
+            this.dirty = false
             
             // Emit event for other components to react
-            this.events.emit('playerDataUpdated', this.data);
+            this.events.emit('playerDataUpdated', this.data)
+            console.log("PLAYER DATA LOADED FROM SERVER: ", this.data)
         }
     }
 

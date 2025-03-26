@@ -8,8 +8,6 @@ networkService.connect();
 setTimeout(init, 5000);
 function init() {
     PreloadScene.map = networkService.map;
-    console.log("net map"+networkService.map)
-    console.log("preload map"+PreloadScene.map)
     //Game Config
     const config = {
         type: Phaser.AUTO,

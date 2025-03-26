@@ -60,9 +60,17 @@ export class NetworkPlayerManager {
     if(player){
       player.updatePosition(position.x, position.y, position.direction)
       player.playAnimation()
-    
-
-  }
+    } else {
+        const player = new NetworkPlayer(
+            this.scene,
+            position.id,
+            position.position.x,
+            position.position.y,
+            position.position.direction
+        )
+      
+        this.players.set(position.id, player)
+    }
   
   }
 

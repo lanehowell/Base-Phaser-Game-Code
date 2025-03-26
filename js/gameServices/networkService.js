@@ -89,7 +89,7 @@ class NetworkService {
     }
 
     handleMessage(message) {
-        console.log(`WebSocket Message Received: `, message)
+        // console.log(`WebSocket Message Received: `, message)
 
         this.events.emit('message', message)
 
@@ -104,9 +104,7 @@ class NetworkService {
                 console.log("MAP CHANGED"+this.map)
                 break
             case 'self':
-                this.playerData = message.d
                 this.events.emit('playerDataReceived', message.d)
-                console.log("PLAYER DATA RECEIVED", message.d)
                 break
             case 'player':
                 this.events.emit('playerJoined', message.d)
@@ -114,7 +112,7 @@ class NetworkService {
                 break
             case 'position':
                 this.events.emit('playerMoved', message.d)
-                console.log('Player Moved: ', message.d)
+                // console.log('Player Moved: ', message.d)
         }
 
     }
@@ -131,7 +129,7 @@ class NetworkService {
                 p: "position",
                 d: [playerData.position.x, playerData.position.y, playerData.position.direction, playerData.position.map]
             })
-            console.log(message)
+            console.log("Message Sent to Server: ", message)
             this.socket.send(message)
 
             
