@@ -64,6 +64,20 @@ export class NetworkPlayer {
 
   }
 
+  updatePosition(x, y, direction) {
+
+    this.sprite.x = x
+    this.sprite.y = y
+
+    if(direction !== this.direction){
+      this.direction = direction
+      this.sprite.setTexture(`PLAYER_${direction.toUpperCase()}`)
+    }
+
+    this.playAnimation()
+
+  }
+
   getSprite() {
 
     return this.sprite
