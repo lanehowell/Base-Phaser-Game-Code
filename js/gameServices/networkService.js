@@ -99,8 +99,8 @@ class NetworkService {
 
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
         switch(message.p){
-            case 'map':
-                this.map = message.d
+            case 'init_packet':
+                this.map = message.d.map
                 console.log("MAP CHANGED"+this.map)
                 break
             case 'self':
