@@ -8,6 +8,7 @@ export class NetworkPlayer {
     this.direction = direction || 'down'
     this.name = name
     this.currentTween = null
+    this.tweenInProgress = false
 
     this.init(x, y)
   }
@@ -75,15 +76,33 @@ export class NetworkPlayer {
 
   updatePosition(x, y, direction) {
 
-    this.sprite.x = x
-    this.sprite.y = y
+    if(this.currentTween){
+      this.currentTween.stop()
+    }
 
     if(direction !== this.direction){
       this.direction = direction
       this.sprite.setTexture(`PLAYER_${direction.toUpperCase()}`)
     }
 
-    this.updateNameTagPosition()
+    this.tweenInProgress = true
+    this.playAnimation()
+
+    this.currentTween = this.scene.tweens.add({
+      targets: this.sprite,
+      x: x,
+      y: y,
+      duration: 45,
+      ease: 'Linear',
+      onUpdate: ()=>{
+        this.updateNameTagPosition()
+      },
+      onComplete: ()=>{
+        this.tweenInProgress = false
+        this.stopAnimation()
+      }
+    })
+
 
   }
 
