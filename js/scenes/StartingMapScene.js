@@ -1,10 +1,9 @@
 import { MAP_KEYS } from "../../assets/maps/mapKeys.js";
 import { TILESET_KEYS } from "../../assets/maps/tilesets/tilesetKeys.js";
 import { SCENE_KEYS } from "./SceneKeys.js";
-import { ToolSystem } from "../utilityClasses/toolSystem.js";
 import playerDataService from "../gameServices/playerDataService.js";
 import { BaseScene } from "./baseScene.js";
-import { NetworkPlayerManager } from "../gameServices/networkPlayerManager.js";
+import { MapEditSystem } from "../utilityClasses/mapEditSystem.js";
 
 export class StartingMapScene extends BaseScene {
     constructor() {
@@ -40,6 +39,8 @@ export class StartingMapScene extends BaseScene {
         this.createPlayer(MAP_KEYS.STARTING_MAP)
         this.setupNetworkPlayerManager() // Base Scene
 
+        this.mapEditSystem = new MapEditSystem(this)
+
         this.createCamera()
         // this.handleClicks()
         this.handleZoom()
@@ -69,11 +70,12 @@ export class StartingMapScene extends BaseScene {
         // Load Tilemap
         this.map = this.make.tilemap({ key: MAP_KEYS.STARTING_MAP, tileHeight: 16, tileWidth: 16 });
 
-        const beach_tiles = this.map.addTilesetImage('beach_tiles', TILESET_KEYS.BEACH_TILESET);
-        const water_layer = this.map.createLayer('Water Layer', beach_tiles, 0, 0);
-        this.ground_layer = this.map.createLayer('Ground Layer', beach_tiles, 0, 0);
+        const beach_tiles = this.map.addTilesetImage('beach_tiles', TILESET_KEYS.BEACH_TILESET)
+        const water_layer = this.map.createLayer('Water Layer', beach_tiles, 0, 0)
+        this.ground_layer = this.map.createLayer('Ground Layer', beach_tiles, 0, 0)
         this.ground_layer.setInteractive()
-        const paths_layer = this.map.createLayer('Paths Layer', beach_tiles, 0, 0);
+        this.paths_layer = this.map.createLayer('Paths Layer', beach_tiles, 0, 0)
+        this.paths_layer.setInteractive()
 
         //Set up barriers
         this.barriers = this.physics.add.group({ immovable: true })

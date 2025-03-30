@@ -7,6 +7,7 @@ import { UIScene } from "./scenes/UIScene.js";
 networkService.connect();
 setTimeout(init, 5000);
 function init() {
+    // @ts-ignore
     PreloadScene.map = networkService.map;
     //Game Config
     const config = {
