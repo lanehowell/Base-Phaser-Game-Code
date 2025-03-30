@@ -15,7 +15,7 @@ export class StartingMapScene extends BaseScene {
     }
 
     init(data) {
-        this.mapId = data.mapId || 'world'
+        this.mapId = data.mapId
 
         playerDataService.events.on('skillLevelUp', this.handleSkillLevelUp, this);
         // playerDataService.events.on('inventoryChanged', this.updateInventoryUI, this);
@@ -54,7 +54,7 @@ export class StartingMapScene extends BaseScene {
 
     update() {
 
-        if(this.player){
+        if(this.player){ 
             this.player.update()
         }
 

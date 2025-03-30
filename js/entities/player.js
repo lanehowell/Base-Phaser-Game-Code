@@ -160,18 +160,18 @@ export class Player {
     }
     
     setPosition(x, y) {
-        this.sprite.x = x;
-        this.sprite.y = y;
-        return this;
+        this.sprite.x = x
+        this.sprite.y = y
+        return this
     }
     
     getSprite() {
-        return this.sprite;
+        return this.sprite
     }
     
     destroy() {
         if (this.sprite) {
-            this.sprite.destroy();
+            this.sprite.destroy()
         }
     }
 

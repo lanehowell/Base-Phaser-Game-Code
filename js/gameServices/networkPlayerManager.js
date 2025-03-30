@@ -1,6 +1,7 @@
 import { NetworkPlayer } from "../entities/networkPlayer.js"
 import networkService from "./networkService.js"
 import playerDataService from "./playerDataService.js"
+import { Player } from "../entities/player.js"
 
 export class NetworkPlayerManager {
   constructor(scene) {
@@ -9,6 +10,16 @@ export class NetworkPlayerManager {
     this.localPlayerId = playerDataService.data.id
 
     this.setupNetworkListeners()
+    this.loadExistingPlayers()
+  }
+
+  loadExistingPlayers() {
+
+    networkService.initialPlayers.forEach(player =>{
+      // Server handles filtering out local player
+      const newPlayer = new NetworkPlayer(this.scene, player.id, player.position.x, player.position.y, player.position.direction, player.name)
+    })
+
   }
 
   setupNetworkListeners() {
@@ -62,7 +73,6 @@ export class NetworkPlayerManager {
       player.updatePosition(position.x, position.y, position.direction)
       player.playAnimation()
     } else {
-        console.log(position)
         const player = new NetworkPlayer(
             this.scene,
             position.id,
@@ -89,8 +99,6 @@ export class NetworkPlayerManager {
   }
 
   update() {
-
-    
 
   }
 }

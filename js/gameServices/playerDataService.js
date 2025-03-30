@@ -19,7 +19,6 @@ class PlayerDataService {
             const now = Date.now();
             if (networkService.isConnected && now - this.lastServerSync >= this.serverSyncInterval) {
                 networkService.sendPlayerData(this.data)
-                console.log("Attempting sync: ", this.data.position)
                 this.lastServerSync = now
             }
         }

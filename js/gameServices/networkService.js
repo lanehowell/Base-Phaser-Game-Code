@@ -3,7 +3,7 @@ class NetworkService {
         this.socket = null,
         this.isConnected = false,
         this.reconnectInterval = null,
-        this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=48bc00a816650d065fef08fcd45d2c1d11b63e5e'
+        this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=d796da2cfe32d665e38a98d74be4738679e94086'
         this.events = new Phaser.Events.EventEmitter()
     }
 
@@ -100,19 +100,17 @@ class NetworkService {
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
         switch(message.p){
             case 'init_packet':
+                this.initialPlayers = message.d.players
                 this.map = message.d.map
-                console.log("MAP CHANGED"+this.map)
                 break
             case 'self':
                 this.events.emit('playerDataReceived', message.d)
                 break
             case 'player':
                 this.events.emit('playerJoined', message.d)
-                console.log("Player Joined", message.d)
                 break
             case 'position':
                 this.events.emit('playerMoved', message.d)
-                // console.log('Player Moved: ', message.d)
                 break
             case 'disconnect':
                 this.events.emit('playerLeft', message.d)
@@ -133,7 +131,6 @@ class NetworkService {
                 p: "position",
                 d: [playerData.position.x, playerData.position.y, playerData.position.direction, playerData.position.map]
             })
-            console.log("Message Sent to Server: ", message)
             this.socket.send(message)
 
             

@@ -1,4 +1,5 @@
 import { Player } from "../entities/player.js";
+import networkService from "../gameServices/networkService.js";
 
 export class BaseScene extends Phaser.Scene {
 
