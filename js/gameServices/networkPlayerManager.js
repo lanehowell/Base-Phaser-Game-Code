@@ -26,7 +26,6 @@ export class NetworkPlayerManager {
   setupNetworkListeners() {
 
     networkService.events.on('playerJoined', (playerData) =>{
-      console.log("EVENT RECEIVED")
       this.handlePlayerJoined(playerData)
     })
 

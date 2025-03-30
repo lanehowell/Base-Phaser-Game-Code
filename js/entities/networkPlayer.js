@@ -21,9 +21,11 @@ export class NetworkPlayer {
 
     this.sprite.body.immovable = true
 
-    this.createNameTag()
+    this.sprite.setInteractive({useHandCursor: true})
 
+    this.createNameTag()
     this.createAnimations()
+    this.setupHoverEvents()
 
   }
 
@@ -131,7 +133,25 @@ export class NetworkPlayer {
 
   createNameTag() {
 
-    this.nameTag = this.scene.add.bitmapText(0, 0, 'Pixeled', this.name, 8).setOrigin(0.5, 1)
+    this.nameTagContainer = this.scene.add.container(0, 0)
+
+    // Nametag Text
+    this.nameText = this.scene.add.bitmapText(0, 0, 'Pixeled', this.name, 8).setOrigin(0.5, 0.5)
+
+    // Nametag Background
+    const bgWidth = this.nameText.width + 12
+    const bgHeight = this.nameText.height + 4
+    this.nametagBackground = this.scene.add.graphics()
+    this.nametagBackground.fillStyle(0x000000, 1)
+    this.nametagBackground.fillRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 6)
+
+    this.nameText.x = 0
+    this.nameText.y = 2
+
+    this.nameTagContainer.add(this.nametagBackground)
+    this.nameTagContainer.add(this.nameText)
+
+    this.nameTagContainer.setVisible(false)
 
     this.updateNameTagPosition()
 
@@ -139,14 +159,26 @@ export class NetworkPlayer {
 
   updateNameTagPosition() {
 
-    this.nameTag.x = Math.floor(this.sprite.x)
-    this.nameTag.y = Math.floor(this.sprite.y - (this.sprite.height * 0.3))
+    this.nameTagContainer.x = Math.floor(this.sprite.x)
+    this.nameTagContainer.y = Math.floor(this.sprite.y - (this.sprite.height * 0.5))
 
   }
 
   getSprite() {
 
     return this.sprite
+
+  }
+
+  setupHoverEvents() {
+
+    this.sprite.on('pointerover', () =>{
+      this.nameTagContainer.setVisible(true)
+    })
+
+    this.sprite.on('pointerout', () =>{
+      this.nameTagContainer.setVisible(false)
+    })
 
   }
 
