@@ -185,7 +185,7 @@ export class NetworkPlayer {
   destroy() {
 
     this.sprite.destroy()
-    this.nameTag.destroy()
+    this.nameTagContainer.destroy()
 
   }
 
