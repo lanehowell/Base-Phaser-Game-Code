@@ -192,7 +192,7 @@ export class NetworkPlayer {
     })
 
     this.sprite.on('pointerout', () =>{
-      hideTimer = this.scene.time.delayedCall(1000, ()=>{
+      hideTimer = this.scene.time.delayedCall(750, ()=>{
         this.scene.tweens.add({
           targets: this.nameTagContainer,
           scale: 0,
