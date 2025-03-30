@@ -17,6 +17,8 @@ export class NetworkPlayer {
   
     this.sprite = this.scene.physics.add.sprite(x, y, `PLAYER_${this.direction.toUpperCase()}`).setScale(0.5)
 
+    this.sprite.body.immovable = true
+
     this.createNameTag()
 
     this.createAnimations()

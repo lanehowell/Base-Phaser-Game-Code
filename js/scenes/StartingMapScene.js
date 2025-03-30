@@ -39,6 +39,7 @@ export class StartingMapScene extends BaseScene {
 
         this.createPlayer(MAP_KEYS.STARTING_MAP)
         this.networkPlayerManager = new NetworkPlayerManager(this)
+        this.setupNetworkPlayerCollisions()
 
         this.createCamera()
         // this.handleClicks()
@@ -95,6 +96,24 @@ export class StartingMapScene extends BaseScene {
 
     }
 
+    setupNetworkPlayerCollisions() {
+
+        this.networkCollisionsTimer = this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                if(this.networkPlayerCollider){
+                    this.networkPlayerCollider.destroy()
+                }
+
+                const networkPlayers = this.networkPlayerManager.getNetworkPlayersForCollisions()
+
+                this.networkPlayerCollider = this.physics.add.collider(this.player.getSprite(), networkPlayers)
+            },
+            loop: true
+        })
+
+    }
+
     createCamera() {
 
         this.cameraZoom = 2
@@ -125,6 +144,9 @@ export class StartingMapScene extends BaseScene {
     }
 
     shutdown() {
+        if (this.networkCollisionsTimer) {
+            this.networkCollisionsTimer.destroy()
+          }
         playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this);
     }
 }

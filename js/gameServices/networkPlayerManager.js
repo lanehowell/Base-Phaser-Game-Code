@@ -18,6 +18,7 @@ export class NetworkPlayerManager {
     networkService.initialPlayers.forEach(player =>{
       // Server handles filtering out local player
       const newPlayer = new NetworkPlayer(this.scene, player.id, player.position.x, player.position.y, player.position.direction, player.name)
+      this.players.set(newPlayer.id, newPlayer)
     })
 
   }
@@ -95,6 +96,24 @@ export class NetworkPlayerManager {
       player.destroy()
       this.players.delete(playerId)
     }
+
+  }
+
+  getNetworkPlayersForCollisions() {
+
+    const playerSprites = []
+    this.players.forEach(player =>{
+      const playerSprite = player.getSprite()
+      playerSprites.push(playerSprite)
+    })
+
+    const playersGroup = this.scene.physics.add.group(playerSprites)
+
+    playersGroup.getChildren().forEach((sprite) => {
+      sprite.body.immovable = true
+    })
+
+    return playersGroup
 
   }
 
