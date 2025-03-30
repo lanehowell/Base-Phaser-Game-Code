@@ -142,7 +142,7 @@ export class NetworkPlayer {
     const bgWidth = this.nameText.width + 12
     const bgHeight = this.nameText.height + 4
     this.nametagBackground = this.scene.add.graphics()
-    this.nametagBackground.fillStyle(0x000000, 1)
+    this.nametagBackground.fillStyle(0x3b3b3b, 1)
     this.nametagBackground.fillRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 6)
 
     this.nameText.x = 0
@@ -171,13 +171,38 @@ export class NetworkPlayer {
   }
 
   setupHoverEvents() {
+    let hideTimer = null
 
     this.sprite.on('pointerover', () =>{
+      if(hideTimer){
+        this.scene.time.removeEvent(hideTimer)
+        hideTimer = null
+      }else{
+        this.nameTagContainer.setScale(0)
+      }
+
       this.nameTagContainer.setVisible(true)
+
+      this.scene.tweens.add({
+        targets: this.nameTagContainer,
+        scale: 1,
+        duration: 200,
+        ease: 'Back.easeOut'
+      })
     })
 
     this.sprite.on('pointerout', () =>{
-      this.nameTagContainer.setVisible(false)
+      hideTimer = this.scene.time.delayedCall(1000, ()=>{
+        this.scene.tweens.add({
+          targets: this.nameTagContainer,
+          scale: 0,
+          duration: 200,
+          ease: 'Back.easeIn',
+          onComplete: ()=>{
+            this.nameTagContainer.setVisible(false)
+          }
+        })
+      })
     })
 
   }
