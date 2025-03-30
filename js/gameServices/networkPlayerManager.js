@@ -72,7 +72,6 @@ export class NetworkPlayerManager {
     const player = this.players.get(position.id)
     if(player){
       player.updatePosition(position.x, position.y, position.direction)
-      player.playAnimation()
     } else {
         const player = new NetworkPlayer(
             this.scene,
@@ -118,6 +117,10 @@ export class NetworkPlayerManager {
   }
 
   update() {
+
+    this.players.forEach(player => {
+      player.update()
+    })
 
   }
 }

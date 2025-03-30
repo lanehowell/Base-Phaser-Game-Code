@@ -9,6 +9,8 @@ export class NetworkPlayer {
     this.name = name
     this.currentTween = null
     this.tweenInProgress = false
+    this.lastUpdateTime = 0
+    this.movementTimeout = null
 
     this.init(x, y)
   }
@@ -22,6 +24,18 @@ export class NetworkPlayer {
     this.createNameTag()
 
     this.createAnimations()
+
+  }
+
+  update() {
+
+    if (this.tweenInProgress) {
+      if (!this.sprite.anims.isPlaying) {
+        this.sprite.anims.play(this.direction, true)
+      }
+    } else if (this.scene.time.now - this.lastUpdateTime > 100) {
+      this.stopAnimation()
+    }
 
   }
 
@@ -81,30 +95,37 @@ export class NetworkPlayer {
     if(this.currentTween){
       this.currentTween.stop()
     }
-
+  
+    if (this.movementTimeout) {
+      this.scene.time.removeEvent(this.movementTimeout);
+    }
+  
     if(direction !== this.direction){
       this.direction = direction
       this.sprite.setTexture(`PLAYER_${direction.toUpperCase()}`)
     }
-
+  
     this.tweenInProgress = true
-    this.playAnimation()
-
+    this.sprite.anims.play(this.direction, true)
+  
     this.currentTween = this.scene.tweens.add({
       targets: this.sprite,
       x: x,
       y: y,
       duration: 45,
       ease: 'Linear',
-      onUpdate: ()=>{
+      onUpdate: () => {
         this.updateNameTagPosition()
       },
-      onComplete: ()=>{
-        this.tweenInProgress = false
-        this.stopAnimation()
+      onComplete: () => {
+        this.movementTimeout = this.scene.time.delayedCall(50, () => {
+          this.tweenInProgress = false
+          this.stopAnimation()
+        })
       }
     })
-
+  
+    this.lastUpdateTime = this.scene.time.now
 
   }
 
