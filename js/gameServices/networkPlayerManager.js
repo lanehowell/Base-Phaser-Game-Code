@@ -106,7 +106,9 @@ export class NetworkPlayerManager {
     console.log(message)
 
     const player = this.players.get(message.sender)
-    player.showChatBubble(message.message)
+    if (playerDataService.data.id !== message.sender) {
+      player.showChatBubble(message.message)
+    }
 
   }
 

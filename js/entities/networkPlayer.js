@@ -267,7 +267,7 @@ export class NetworkPlayer {
   updateChatBubblePosition() {
     if (this.chatBubble) {
       this.chatBubble.x = Math.floor(this.sprite.x)
-      this.chatBubble.y = Math.floor(this.sprite.y - (this.sprite.height * 0.5) - 25)
+      this.chatBubble.y = Math.floor(this.sprite.y - (this.sprite.height * 0.5))
     }
   }
 
