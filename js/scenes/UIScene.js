@@ -99,6 +99,7 @@ export class UIScene extends Phaser.Scene {
         this.game.events.emit('send-message', inputElement.value)
         networkService.sendChatMessage(inputElement.value)
         inputElement.value = ''
+        inputElement.blur()
       } else if (event.key === 'Escape') {
         inputElement.blur()
       }
