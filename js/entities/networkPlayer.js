@@ -118,6 +118,7 @@ export class NetworkPlayer {
       ease: 'Linear',
       onUpdate: () => {
         this.updateNameTagPosition()
+        this.updateChatBubblePosition()
       },
       onComplete: () => {
         this.movementTimeout = this.scene.time.delayedCall(50, () => {
