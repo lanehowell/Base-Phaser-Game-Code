@@ -11,13 +11,14 @@ export class Player {
         this.mapId = mapId
         this.events = new Phaser.Events.EventEmitter()
         this.id = playerDataService.data.id
+        this.chatBubble = null
+        this.messageTween = null
+        this.messageTimeout = null
 
         this.init()
-        this.chatBubble = null
     }
 
     init() {
-
         const playerData = playerDataService.data
 
         if (playerDataService.data && playerDataService.data.position.map === this.mapId) {
@@ -31,11 +32,9 @@ export class Player {
         this.createAnimations()
 
         this.scene.game.events.on('send-message', this.showMessageBubble, this)
-
     }
 
     update() {
-
         const moveInputs = {
             up: this.cursors.up.isDown,
             left: this.cursors.left.isDown,
@@ -48,10 +47,11 @@ export class Player {
         this.sprite.x = Math.round(this.sprite.x)
         this.sprite.y = Math.round(this.sprite.y)
 
+        // Always update chat bubble position in update loop
+        this.updateChatBubblePosition()
     }
 
     move(input) {
-
         let moveX = 0
         let moveY = 0
         let direction = ''
@@ -103,14 +103,10 @@ export class Player {
             direction,
             this.mapId
         )
-
-        this.updateChatBubblePosition()
-
     }
 
     // Set up animations for player sprite
     createAnimations() {
-
         const frameRate = 8
 
         this.scene.anims.create({
@@ -140,7 +136,6 @@ export class Player {
             frameRate: frameRate,
             repeat: -1,
         })
-
     }
 
     // Set up keybinds for player
@@ -160,11 +155,19 @@ export class Player {
 
     showMessageBubble(message) {
 
-        if (this.chatBubble) {
-            this.chatBubble.destroy()
-        }
+        this.cleanupChatBubble(false);
 
-        this.chatBubble = this.scene.add.container(this.sprite.x, this.sprite.y - (this.sprite.height * 0.5))
+        if (!this.chatBubble) {
+            this.chatBubble = this.scene.add.container(this.sprite.x, this.sprite.y - (this.sprite.height * 0.5));
+            this.chatBubble.setDepth(1000)
+            this.chatBubble.setAlpha(1)
+            this.chatBubble.setScale(0.5)
+        } else {
+
+            this.chatBubble.removeAll(true)
+            this.chatBubble.setAlpha(1)
+            this.chatBubble.setScale(0.5)
+        }
 
         let chatText = this.scene.add.bitmapText(0, 0, 'Pixeled', message, 8).setOrigin(0.5, 0.5)
         chatText.setTint(0x000000)
@@ -173,7 +176,6 @@ export class Player {
 
         const bgWidth = chatText.width + 12
         const bgHeight = chatText.height + 4
-
         const background = this.scene.add.graphics()
         background.fillStyle(0xffffff, 1)
         background.fillRoundedRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 6)
@@ -181,35 +183,50 @@ export class Player {
         this.chatBubble.add(background)
         this.chatBubble.add(chatText)
 
-        this.chatBubble.setDepth(1000)
+        this.updateChatBubblePosition()
 
-        this.chatBubble.setScale(0.5)
-
-        this.scene.tweens.add({
+        this.messageTween = this.scene.tweens.add({
             targets: this.chatBubble,
             scale: 1,
             duration: 200,
             ease: 'Back.easeOut'
         })
 
-        this.scene.time.delayedCall(5000, () => {
-            if (this.chatBubble) {
-                this.scene.tweens.add({
-                    targets: this.chatBubble,
-                    alpha: 0,
-                    scale: 0.8,
-                    duration: 200,
-                    ease: 'Sine.easeOut',
-                    onComplete: () => {
-                        if (this.chatBubble) {
-                            this.chatBubble.destroy();
-                            this.chatBubble = null;
-                        }
-                    }
-                })
-            }
+        this.messageTimeout = this.scene.time.delayedCall(5000, () => {
+            this.fadeOutChatBubble()
         })
+    }
 
+    fadeOutChatBubble() {
+        if (this.chatBubble) {
+            this.messageTween = this.scene.tweens.add({
+                targets: this.chatBubble,
+                alpha: 0,
+                scale: 0.8,
+                duration: 200,
+                ease: 'Sine.easeOut',
+                onComplete: () => {
+                    this.cleanupChatBubble(true)
+                }
+            });
+        }
+    }
+
+    cleanupChatBubble(destroyContainer) {
+        if (this.messageTween) {
+            this.messageTween.stop()
+            this.messageTween = null
+        }
+
+        if (this.messageTimeout) {
+            this.messageTimeout.remove()
+            this.messageTimeout = null
+        }
+
+        if (destroyContainer && this.chatBubble) {
+            this.chatBubble.destroy()
+            this.chatBubble = null
+        }
     }
 
     updateChatBubblePosition() {
@@ -237,9 +254,12 @@ export class Player {
     }
 
     destroy() {
+        this.scene.game.events.off('send-message', this.showMessageBubble, this)
+
+        this.cleanupChatBubble(true)
+
         if (this.sprite) {
             this.sprite.destroy()
         }
     }
-
 }

@@ -11,26 +11,24 @@ export class NetworkPlayer {
     this.tweenInProgress = false
     this.lastUpdateTime = 0
     this.movementTimeout = null
+    this.chatBubble = null
+    this.messageTween = null
+    this.messageTimeout = null
 
     this.init(x, y)
   }
 
   init(x, y) {
-
     this.sprite = this.scene.physics.add.sprite(x, y, `PLAYER_${this.direction.toUpperCase()}`).setScale(0.5)
-
     this.sprite.body.immovable = true
-
     this.sprite.setInteractive({ useHandCursor: true })
 
     this.createNameTag()
     this.createAnimations()
     this.setupHoverEvents()
-
   }
 
   update() {
-
     if (this.tweenInProgress) {
       if (!this.sprite.anims.isPlaying) {
         this.sprite.anims.play(this.direction, true)
@@ -39,10 +37,11 @@ export class NetworkPlayer {
       this.stopAnimation()
     }
 
+    // Always update chat bubble position in update loop if it exists
+    this.updateChatBubblePosition()
   }
 
   createAnimations() {
-
     const frameRate = 8
 
     if (!this.scene.anims.exists('down')) {
@@ -77,7 +76,6 @@ export class NetworkPlayer {
         repeat: -1,
       })
     }
-
   }
 
   playAnimation() {
@@ -87,19 +85,16 @@ export class NetworkPlayer {
   }
 
   stopAnimation() {
-
     this.sprite.anims.stop()
-
   }
 
   updatePosition(x, y, direction) {
-
     if (this.currentTween) {
       this.currentTween.stop()
     }
 
     if (this.movementTimeout) {
-      this.scene.time.removeEvent(this.movementTimeout);
+      this.scene.time.removeEvent(this.movementTimeout)
     }
 
     if (direction !== this.direction) {
@@ -129,11 +124,9 @@ export class NetworkPlayer {
     })
 
     this.lastUpdateTime = this.scene.time.now
-
   }
 
   createNameTag() {
-
     this.nameTagContainer = this.scene.add.container(0, 0)
 
     // Nametag Text
@@ -155,20 +148,15 @@ export class NetworkPlayer {
     this.nameTagContainer.setVisible(false)
 
     this.updateNameTagPosition()
-
   }
 
   updateNameTagPosition() {
-
     this.nameTagContainer.x = Math.floor(this.sprite.x)
     this.nameTagContainer.y = Math.floor(this.sprite.y + 25)
-
   }
 
   getSprite() {
-
     return this.sprite
-
   }
 
   setupHoverEvents() {
@@ -205,22 +193,28 @@ export class NetworkPlayer {
         })
       })
     })
-
   }
 
   showChatBubble(message) {
 
-    if (this.chatBubble) {
-      this.chatBubble.destroy();
+    this.cleanupChatBubble(false)
+
+    if (!this.chatBubble) {
+      this.chatBubble = this.scene.add.container(0, 0)
+      this.chatBubble.setDepth(1000)
+      this.chatBubble.setAlpha(1)
+      this.chatBubble.setScale(0.5)
+    } else {
+      this.chatBubble.removeAll(true)
+      this.chatBubble.setAlpha(1)
+      this.chatBubble.setScale(0.5)
     }
 
-    this.chatBubble = this.scene.add.container(0, 0);
+    const chatText = this.scene.add.bitmapText(0, 0, 'Pixeled', message, 8).setOrigin(0.5, 0.5)
+    chatText.setTint(0x000000)
 
-    const chatText = this.scene.add.bitmapText(0, 0, 'Pixeled', message, 8).setOrigin(0.5, 0.5);
-    chatText.setTint(0x000000);
-
-    const bgWidth = chatText.width + 12;
-    const bgHeight = chatText.height + 4;
+    const bgWidth = chatText.width + 12
+    const bgHeight = chatText.height + 4
 
     const background = this.scene.add.graphics()
     background.fillStyle(0xffffff, 1)
@@ -229,40 +223,53 @@ export class NetworkPlayer {
     chatText.x = 0
     chatText.y = 2
 
-    this.chatBubble.add(background);
-    this.chatBubble.add(chatText);
+    this.chatBubble.add(background)
+    this.chatBubble.add(chatText)
 
-    this.chatBubble.setDepth(1000);
+    this.updateChatBubblePosition()
 
-    this.updateChatBubblePosition();
-
-    this.chatBubble.setScale(0.5);
-
-    this.scene.tweens.add({
+    this.messageTween = this.scene.tweens.add({
       targets: this.chatBubble,
       scale: 1,
       duration: 200,
       ease: 'Back.easeOut'
-    });
+    })
 
-    this.scene.time.delayedCall(5000, () => {
-      if (this.chatBubble) {
-        this.scene.tweens.add({
-          targets: this.chatBubble,
-          alpha: 0,
-          scale: 0.8,
-          duration: 200,
-          ease: 'Sine.easeOut',
-          onComplete: () => {
-            if (this.chatBubble) {
-              this.chatBubble.destroy()
-              this.chatBubble = null
-            }
-          }
-        });
-      }
-    });
+    this.messageTimeout = this.scene.time.delayedCall(5000, () => {
+      this.fadeOutChatBubble()
+    })
+  }
 
+  fadeOutChatBubble() {
+    if (this.chatBubble) {
+      this.messageTween = this.scene.tweens.add({
+        targets: this.chatBubble,
+        alpha: 0,
+        scale: 0.8,
+        duration: 200,
+        ease: 'Sine.easeOut',
+        onComplete: () => {
+          this.cleanupChatBubble(true)
+        }
+      })
+    }
+  }
+
+  cleanupChatBubble(destroyContainer) {
+    if (this.messageTween) {
+      this.messageTween.stop()
+      this.messageTween = null
+    }
+
+    if (this.messageTimeout) {
+      this.messageTimeout.remove()
+      this.messageTimeout = null
+    }
+
+    if (destroyContainer && this.chatBubble) {
+      this.chatBubble.destroy()
+      this.chatBubble = null
+    }
   }
 
   updateChatBubblePosition() {
@@ -273,11 +280,14 @@ export class NetworkPlayer {
   }
 
   destroy() {
+    this.cleanupChatBubble(true)
 
-    this.sprite.destroy()
-    this.nameTagContainer.destroy()
+    if (this.sprite) {
+      this.sprite.destroy()
+    }
 
+    if (this.nameTagContainer) {
+      this.nameTagContainer.destroy()
+    }
   }
-
 }
-
