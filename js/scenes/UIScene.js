@@ -24,6 +24,29 @@ export class UIScene extends Phaser.Scene {
     this.energyIcon = this.add.image(10, 45, 'UIEnergy').setOrigin(0).setScale(2)
     this.uiContainer.add(this.energyIcon)
 
+    this.createChatUI()
+    
+    this.scale.on('resize', this.handleResize, this)
+
+  }
+
+  createChatUI() {
+    let gameHeight = this.scale.height;
+    let gameWidth = this.scale.width;
+    
+    if (this.chatContainer) {
+      this.chatContainer.destroy()
+    }
+    
+    this.chatContainer = this.add.container(0, gameHeight - 20)
+    
+    this.panel = this.add.rectangle(15, 0, gameWidth / 2.5, 40, 0X000000, .5).setOrigin(0, 1)
+      
+    this.chatContainer.add(this.panel)
+  }
+
+  handleResize() {
+    this.createChatUI()
   }
 
 }

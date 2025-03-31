@@ -73,6 +73,7 @@ export class Player {
         // Only process movement if actually moving
         if (moveX === 0 && moveY === 0) {
             this.sprite.setVelocity(0, 0)
+            this.sprite.setFrame(0)
             this.sprite.anims.stop()
             return
         }
