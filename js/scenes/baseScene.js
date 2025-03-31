@@ -12,6 +12,11 @@ export class BaseScene extends Phaser.Scene {
             this.player.setupCollisions(this.barriers)
             this.player.setupControls()
         }
+        // @ts-ignore
+        if(this.portals){
+            // @ts-ignore
+            this.player.setupPortals(this.portals)
+        }
 
         return this.player
     }

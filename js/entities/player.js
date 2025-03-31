@@ -1,5 +1,6 @@
 import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js";
 import playerDataService from "../gameServices/playerDataService.js";
+import networkService from "../gameServices/networkService.js"
 
 export class Player {
     constructor(scene, mapId) {
@@ -151,6 +152,13 @@ export class Player {
     // Add collions for any barriers on the map
     setupCollisions(barriers) {
         this.scene.physics.add.collider(this.sprite, barriers)
+    }
+
+    // Add collions for portals on the map
+    setupPortals(portals) {
+        this.scene.physics.add.collider(this.sprite, portals, function(player, portal){
+            networkService.sendTeleportRequest(portal.name)
+        })
     }
 
     showMessageBubble(message) {

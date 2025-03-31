@@ -94,7 +94,22 @@ export class StartingMapScene extends BaseScene {
             barrier.setImmovable(true)
             this.barriers.add(barrier)
         })
-
+        //Set up portals
+        this.portals = this.physics.add.group({ immovable: true })
+        this.portalObjects = this.map.getObjectLayer('Portals').objects
+        this.portalObjects.forEach((portalObject) => {
+            console.log(portalObject)
+            const portal = this.physics.add.sprite(
+                portalObject.x + (portalObject.width / 2),
+                portalObject.y + (portalObject.height / 2),
+                null
+            )
+            portal.setSize(portalObject.width, portalObject.height)
+            portal.setVisible(true)
+            portal.setName(portalObject.name)
+            portal.setImmovable(true)
+            this.portals.add(portal)
+        })
     }
 
     createCamera() {

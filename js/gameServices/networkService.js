@@ -169,6 +169,27 @@ class NetworkService {
 
     }
 
+    sendTeleportRequest(portalName) {
+        if (!this.isConnected) {
+            console.warn("Cannot send teleport request: WebSocket not connected");
+            return false
+        }
+
+        try {
+            const message = JSON.stringify({
+                p: "teleport",
+                d: portalName
+            })
+            console.log(message)
+            this.socket.send(message)
+
+
+            return true
+        } catch (error) {
+            console.error("Error sending teleport request:", error)
+            return false
+        }
+    }
 }
 
 const networkService = new NetworkService()
