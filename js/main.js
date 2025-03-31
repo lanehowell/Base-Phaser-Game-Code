@@ -5,7 +5,7 @@ import { UIScene } from "./scenes/UIScene.js";
 
 //Initialize WebSocket Connection
 networkService.connect();
-setTimeout(init, 5000);
+setTimeout(init, 10000);
 function init() {
     // @ts-ignore
     PreloadScene.map = networkService.map;
@@ -30,16 +30,20 @@ function init() {
                 debug: false,
                 fps: 60
             }
+        },
+        dom: {
+            createContainer: true
         }
     }
-    
+
     //Create Game
     const game = new Phaser.Game(config)
-    
-    
+
+
     //Handle Window Resizing
     window.addEventListener('resize', () => {
         game.canvas.height = window.innerHeight - 50
         game.canvas.width = window.innerWidth
-    });}
+    });
+}
 

@@ -13,13 +13,14 @@ export class Player {
         this.id = playerDataService.data.id
 
         this.init()
+        this.chatBubble = null
     }
 
     init() {
 
         const playerData = playerDataService.data
-        
-        if(playerDataService.data && playerDataService.data.position.map === this.mapId) {
+
+        if (playerDataService.data && playerDataService.data.position.map === this.mapId) {
             this.sprite = this.scene.physics.add.sprite(playerData.position.x, playerData.position.y, `PLAYER_${playerData.position.direction.toUpperCase()}`).setScale(.5)
         } else {
             this.sprite = this.scene.physics.add.sprite(700, 700, SPRITE_KEYS.PLAYER_DOWN).setScale(.5)
@@ -28,6 +29,8 @@ export class Player {
         this.sprite.body.setDamping(true)
 
         this.createAnimations()
+
+        this.scene.game.events.on('send-message', this.showMessageBubble, this)
 
     }
 
@@ -52,7 +55,7 @@ export class Player {
         let moveX = 0
         let moveY = 0
         let direction = ''
-        
+
         // Process input
         if (input.left) {
             moveX = -1
@@ -61,7 +64,7 @@ export class Player {
             moveX = 1
             direction = 'right'
         }
-        
+
         if (input.up) {
             moveY = -1
             direction = 'up'
@@ -69,7 +72,7 @@ export class Player {
             moveY = 1
             direction = 'down'
         }
-        
+
         // Only process movement if actually moving
         if (moveX === 0 && moveY === 0) {
             this.sprite.setVelocity(0, 0)
@@ -77,29 +80,31 @@ export class Player {
             this.sprite.anims.stop()
             return
         }
-        
+
         // Normalize movement
         const movement = new Phaser.Math.Vector2(moveX, moveY).normalize()
-        
+
         // Calculate the velocity
         const velocityX = movement.x * this.movementSpeed
         const velocityY = movement.y * this.movementSpeed
-        
+
         // Set the velocity directly
         this.sprite.setVelocity(velocityX, velocityY)
-        
+
         // Play animation
         if (direction) {
             this.sprite.anims.play(direction, true)
         }
-        
+
         // Save position to data service
         playerDataService.updatePosition(
-            Math.round(this.sprite.x), 
-            Math.round(this.sprite.y), 
-            direction, 
+            Math.round(this.sprite.x),
+            Math.round(this.sprite.y),
+            direction,
             this.mapId
         )
+
+        this.updateChatBubblePosition()
 
     }
 
@@ -149,27 +154,88 @@ export class Player {
     }
 
     // Add collions for any barriers on the map
-    setupCollisions(barriers){
+    setupCollisions(barriers) {
         this.scene.physics.add.collider(this.sprite, barriers)
     }
-    
+
+    showMessageBubble(message) {
+
+        if (this.chatBubble) {
+            this.chatBubble.destroy()
+        }
+
+        this.chatBubble = this.scene.add.container(this.sprite.x, this.sprite.y - (this.sprite.height * 0.5))
+
+        let chatText = this.scene.add.bitmapText(0, 0, 'Pixeled', message, 8).setOrigin(0.5, 0.5)
+        chatText.setTint(0x000000)
+        chatText.x = 0
+        chatText.y = 2
+
+        const bgWidth = chatText.width + 12
+        const bgHeight = chatText.height + 4
+
+        const background = this.scene.add.graphics()
+        background.fillStyle(0xffffff, 1)
+        background.fillRoundedRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 6)
+
+        this.chatBubble.add(background)
+        this.chatBubble.add(chatText)
+
+        this.chatBubble.setDepth(1000)
+
+        this.chatBubble.setScale(0.5)
+
+        this.scene.tweens.add({
+            targets: this.chatBubble,
+            scale: 1,
+            duration: 200,
+            ease: 'Back.easeOut'
+        })
+
+        this.scene.time.delayedCall(5000, () => {
+            if (this.chatBubble) {
+                this.scene.tweens.add({
+                    targets: this.chatBubble,
+                    alpha: 0,
+                    scale: 0.8,
+                    duration: 200,
+                    ease: 'Sine.easeOut',
+                    onComplete: () => {
+                        if (this.chatBubble) {
+                            this.chatBubble.destroy();
+                            this.chatBubble = null;
+                        }
+                    }
+                })
+            }
+        })
+
+    }
+
+    updateChatBubblePosition() {
+        if (this.chatBubble) {
+            this.chatBubble.x = this.sprite.x
+            this.chatBubble.y = this.sprite.y - (this.sprite.height * 0.5)
+        }
+    }
+
     getPosition() {
         return {
             x: this.sprite.x,
             y: this.sprite.y
-        };
+        }
     }
-    
+
     setPosition(x, y) {
         this.sprite.x = x
         this.sprite.y = y
         return this
     }
-    
+
     getSprite() {
         return this.sprite
     }
-    
+
     destroy() {
         if (this.sprite) {
             this.sprite.destroy()

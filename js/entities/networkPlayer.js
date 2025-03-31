@@ -16,12 +16,12 @@ export class NetworkPlayer {
   }
 
   init(x, y) {
-  
+
     this.sprite = this.scene.physics.add.sprite(x, y, `PLAYER_${this.direction.toUpperCase()}`).setScale(0.5)
 
     this.sprite.body.immovable = true
 
-    this.sprite.setInteractive({useHandCursor: true})
+    this.sprite.setInteractive({ useHandCursor: true })
 
     this.createNameTag()
     this.createAnimations()
@@ -42,74 +42,74 @@ export class NetworkPlayer {
   }
 
   createAnimations() {
-  
+
     const frameRate = 8
 
-    if(!this.scene.anims.exists('down')){
+    if (!this.scene.anims.exists('down')) {
       this.scene.anims.create({
         key: 'down',
         frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_DOWN, { start: 0, end: 3 }),
         frameRate: frameRate,
         repeat: -1,
-    })
+      })
     }
-    if(!this.scene.anims.exists('up')){
+    if (!this.scene.anims.exists('up')) {
       this.scene.anims.create({
         key: 'up',
         frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_UP, { start: 0, end: 3 }),
         frameRate: frameRate,
         repeat: -1,
-    })
+      })
     }
-    if(!this.scene.anims.exists('left')){
+    if (!this.scene.anims.exists('left')) {
       this.scene.anims.create({
         key: 'left',
         frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_LEFT, { start: 0, end: 3 }),
         frameRate: frameRate,
         repeat: -1,
-    })
+      })
     }
-    if(!this.scene.anims.exists('right')){
+    if (!this.scene.anims.exists('right')) {
       this.scene.anims.create({
         key: 'right',
         frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_RIGHT, { start: 0, end: 3 }),
         frameRate: frameRate,
         repeat: -1,
-    })
+      })
     }
-  
+
   }
-  
+
   playAnimation() {
-    if(this.sprite && this.direction){
+    if (this.sprite && this.direction) {
       this.sprite.anims.play(this.direction, true)
     }
   }
 
   stopAnimation() {
-    
+
     this.sprite.anims.stop()
 
   }
 
   updatePosition(x, y, direction) {
 
-    if(this.currentTween){
+    if (this.currentTween) {
       this.currentTween.stop()
     }
-  
+
     if (this.movementTimeout) {
       this.scene.time.removeEvent(this.movementTimeout);
     }
-  
-    if(direction !== this.direction){
+
+    if (direction !== this.direction) {
       this.direction = direction
       this.sprite.setTexture(`PLAYER_${direction.toUpperCase()}`)
     }
-  
+
     this.tweenInProgress = true
     this.sprite.anims.play(this.direction, true)
-  
+
     this.currentTween = this.scene.tweens.add({
       targets: this.sprite,
       x: x,
@@ -126,7 +126,7 @@ export class NetworkPlayer {
         })
       }
     })
-  
+
     this.lastUpdateTime = this.scene.time.now
 
   }
@@ -143,7 +143,7 @@ export class NetworkPlayer {
     const bgHeight = this.nameText.height + 4
     this.nametagBackground = this.scene.add.graphics()
     this.nametagBackground.fillStyle(0x3b3b3b, 1)
-    this.nametagBackground.fillRoundedRect(-bgWidth/2, -bgHeight/2, bgWidth, bgHeight, 6)
+    this.nametagBackground.fillRoundedRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 6)
 
     this.nameText.x = 0
     this.nameText.y = 2
@@ -173,11 +173,11 @@ export class NetworkPlayer {
   setupHoverEvents() {
     let hideTimer = null
 
-    this.sprite.on('pointerover', () =>{
-      if(hideTimer){
+    this.sprite.on('pointerover', () => {
+      if (hideTimer) {
         this.scene.time.removeEvent(hideTimer)
         hideTimer = null
-      }else{
+      } else {
         this.nameTagContainer.setScale(0)
       }
 
@@ -191,20 +191,84 @@ export class NetworkPlayer {
       })
     })
 
-    this.sprite.on('pointerout', () =>{
-      hideTimer = this.scene.time.delayedCall(750, ()=>{
+    this.sprite.on('pointerout', () => {
+      hideTimer = this.scene.time.delayedCall(750, () => {
         this.scene.tweens.add({
           targets: this.nameTagContainer,
           scale: 0,
           duration: 200,
           ease: 'Back.easeIn',
-          onComplete: ()=>{
+          onComplete: () => {
             this.nameTagContainer.setVisible(false)
           }
         })
       })
     })
 
+  }
+
+  showChatBubble(message) {
+
+    if (this.chatBubble) {
+      this.chatBubble.destroy();
+    }
+
+    this.chatBubble = this.scene.add.container(0, 0);
+
+    const chatText = this.scene.add.bitmapText(0, 0, 'Pixeled', message, 8).setOrigin(0.5, 0.5);
+    chatText.setTint(0x000000);
+
+    const bgWidth = chatText.width + 12;
+    const bgHeight = chatText.height + 4;
+
+    const background = this.scene.add.graphics()
+    background.fillStyle(0xffffff, 1)
+    background.fillRoundedRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 6)
+
+    chatText.x = 0
+    chatText.y = 2
+
+    this.chatBubble.add(background);
+    this.chatBubble.add(chatText);
+
+    this.chatBubble.setDepth(1000);
+
+    this.updateChatBubblePosition();
+
+    this.chatBubble.setScale(0.5);
+
+    this.scene.tweens.add({
+      targets: this.chatBubble,
+      scale: 1,
+      duration: 200,
+      ease: 'Back.easeOut'
+    });
+
+    this.scene.time.delayedCall(5000, () => {
+      if (this.chatBubble) {
+        this.scene.tweens.add({
+          targets: this.chatBubble,
+          alpha: 0,
+          scale: 0.8,
+          duration: 200,
+          ease: 'Sine.easeOut',
+          onComplete: () => {
+            if (this.chatBubble) {
+              this.chatBubble.destroy()
+              this.chatBubble = null
+            }
+          }
+        });
+      }
+    });
+
+  }
+
+  updateChatBubblePosition() {
+    if (this.chatBubble) {
+      this.chatBubble.x = Math.floor(this.sprite.x)
+      this.chatBubble.y = Math.floor(this.sprite.y - (this.sprite.height * 0.5) - 25)
+    }
   }
 
   destroy() {

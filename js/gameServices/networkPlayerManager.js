@@ -15,7 +15,7 @@ export class NetworkPlayerManager {
 
   loadExistingPlayers() {
 
-    networkService.initialPlayers.forEach(player =>{
+    networkService.initialPlayers.forEach(player => {
       // Server handles filtering out local player
       const newPlayer = new NetworkPlayer(this.scene, player.id, player.position.x, player.position.y, player.position.direction, player.name)
       this.players.set(newPlayer.id, newPlayer)
@@ -25,29 +25,33 @@ export class NetworkPlayerManager {
 
   setupNetworkListeners() {
 
-    networkService.events.on('playerJoined', (playerData) =>{
+    networkService.events.on('playerJoined', (playerData) => {
       this.handlePlayerJoined(playerData)
     })
 
-    networkService.events.on('playerMoved', (position) =>{
+    networkService.events.on('playerMoved', (position) => {
       this.handlePlayerMove(position)
     })
 
-    networkService.events.on('playerLeft', (playerId) =>{
+    networkService.events.on('playerLeft', (playerId) => {
       this.handlePlayerLeft(playerId)
+    })
+
+    networkService.events.on('chatReceived', (message) => {
+      this.handleChatReceived(message)
     })
 
   }
 
   handlePlayerJoined(playerData) {
 
-    if (playerData.id === this.localPlayerId){
+    if (playerData.id === this.localPlayerId) {
       return
     }
 
     console.log(`Player Joined!: `, playerData.position)
 
-    if(!this.players.has(playerData.id)){
+    if (!this.players.has(playerData.id)) {
       const player = new NetworkPlayer(
         this.scene,
         playerData.id,
@@ -64,31 +68,31 @@ export class NetworkPlayerManager {
 
   handlePlayerMove(position) {
 
-    if(position.id === this.localPlayerId){
+    if (position.id === this.localPlayerId) {
       return
     }
 
     const player = this.players.get(position.id)
-    if(player){
+    if (player) {
       player.updatePosition(position.x, position.y, position.direction)
     } else {
-        const player = new NetworkPlayer(
-            this.scene,
-            position.id,
-            position.x,
-            position.y,
-            position.direction,
-            position.id
-        )
-      
-        this.players.set(position.id, player)
+      const player = new NetworkPlayer(
+        this.scene,
+        position.id,
+        position.x,
+        position.y,
+        position.direction,
+        position.id
+      )
+
+      this.players.set(position.id, player)
     }
-  
+
   }
 
   handlePlayerLeft(playerId) {
 
-    if(this.players.has(playerId)) {
+    if (this.players.has(playerId)) {
       console.log(`Player Left: ${playerId}`)
       const player = this.players.get(playerId)
       player.destroy()
@@ -97,10 +101,19 @@ export class NetworkPlayerManager {
 
   }
 
+  handleChatReceived(message) {
+
+    console.log(message)
+
+    const player = this.players.get(message.sender)
+    player.showChatBubble(message.message)
+
+  }
+
   getNetworkPlayersForCollisions() {
 
     const playerSprites = []
-    this.players.forEach(player =>{
+    this.players.forEach(player => {
       const playerSprite = player.getSprite()
       playerSprites.push(playerSprite)
     })

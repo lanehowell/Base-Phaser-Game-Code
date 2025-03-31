@@ -1,27 +1,27 @@
 class NetworkService {
     constructor() {
         this.socket = null,
-        this.isConnected = false,
-        this.reconnectInterval = null,
-        this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=d796da2cfe32d665e38a98d74be4738679e94086'
+            this.isConnected = false,
+            this.reconnectInterval = null,
+            this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=d796da2cfe32d665e38a98d74be4738679e94086'
         this.events = new Phaser.Events.EventEmitter()
     }
 
     connect() {
         this.socket = new WebSocket(this.serverURL)
 
-        this.socket.onopen = () =>{
+        this.socket.onopen = () => {
 
             console.log("WebSocket Connection Successful")
             this.isConnected = true
             clearInterval(this.reconnectInterval)
         }
 
-        this.socket.onclose = (event) =>{
+        this.socket.onclose = (event) => {
             console.log('WebSocket connection closed');
             this.isConnected = false
 
-            switch(event.code) {
+            switch (event.code) {
                 case 1000:
                     console.log("Normal closure - connection successfully completed");
                     break;
@@ -69,20 +69,20 @@ class NetworkService {
                     break;
                 default:
                     console.log(`Unknown close code: ${event.code}`);
-            } 
+            }
 
-            if(!this.reconnectInterval){
-                this.reconnectInterval = setInterval(()=>{
-                    if(!this.isConnected) this.connect()
+            if (!this.reconnectInterval) {
+                this.reconnectInterval = setInterval(() => {
+                    if (!this.isConnected) this.connect()
                 }, 5000)
             }
         }
 
-        this.socket.onerror = (error) =>{
+        this.socket.onerror = (error) => {
             console.log(`WebSocket Error: ${error}`)
         }
 
-        this.socket.onmessage = (event) =>{
+        this.socket.onmessage = (event) => {
             const message = JSON.parse(event.data)
             this.handleMessage(message)
         }
@@ -93,12 +93,12 @@ class NetworkService {
 
         this.events.emit('message', message)
 
-        if(message && message.p){
+        if (message && message.p) {
             this.events.emit(`message: ${message.p}, ${message.d}`)
         }
 
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
-        switch(message.p){
+        switch (message.p) {
             case 'init_packet':
                 this.initialPlayers = message.d.players
                 this.map = message.d.map
@@ -115,13 +115,17 @@ class NetworkService {
             case 'disconnect':
                 this.events.emit('playerLeft', message.d)
                 break
+            case 'chat':
+                this.events.emit('chatReceived', message.d)
+            default:
+                console.log(message)
         }
 
     }
 
     sendPlayerData(playerData) {
 
-        if(!this.isConnected){
+        if (!this.isConnected) {
             console.warn("Cannot send player data: WebSocket not connected");
             return false;
         }
@@ -133,12 +137,36 @@ class NetworkService {
             })
             this.socket.send(message)
 
-            
+
             return true
         } catch (error) {
             console.error("Error sending player data:", error)
             return false
         }
+    }
+
+    sendChatMessage(chatMessage) {
+
+        if (!this.isConnected) {
+            console.warn("Cannot send chat message: WebSocket not connected");
+            return false
+        }
+
+        try {
+            const message = JSON.stringify({
+                p: "chat",
+                d: { destination: "map", message: chatMessage }
+            })
+            console.log(message)
+            this.socket.send(message)
+
+
+            return true
+        } catch (error) {
+            console.error("Error sending chat message:", error)
+            return false
+        }
+
     }
 
 }
