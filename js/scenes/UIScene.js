@@ -74,14 +74,13 @@ export class UIScene extends Phaser.Scene {
     inputElement.type = 'text'
     inputElement.placeholder = 'Type message...'
     inputElement.style = `
-      width: ${gameWidth / 3}px;
-      height: 30px;
+      width: ${(gameWidth / 2.5) - 10}px;
+      height: 40px;
       padding: 5px;
       position: absolute;
-      top: ${gameHeight - 4}px;
+      border: none;
+      top: ${gameHeight - 10}px;
       left: 20px;
-      border: 2px solid #333;
-      border-radius: 5px;
       background: transparent;
       font-family: 'Press Start 2P', sans-serif;
       color: white;

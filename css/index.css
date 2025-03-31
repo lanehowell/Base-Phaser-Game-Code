@@ -9,7 +9,7 @@
     src: url('assets/fonts/Pixeled.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-  }
+}
 
 body {
     display: flex;
@@ -67,4 +67,12 @@ main {
     background-color: rgb(19, 19, 19);
     width: 100%;
     height: 100%;
+}
+
+input:focus {
+    outline: none;
+}
+
+input::placeholder {
+    color: #c5c5c5
 }
