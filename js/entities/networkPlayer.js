@@ -161,7 +161,7 @@ export class NetworkPlayer {
   updateNameTagPosition() {
 
     this.nameTagContainer.x = Math.floor(this.sprite.x)
-    this.nameTagContainer.y = Math.floor(this.sprite.y - (this.sprite.height * 0.5))
+    this.nameTagContainer.y = Math.floor(this.sprite.y + 25)
 
   }
 
