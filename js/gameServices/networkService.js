@@ -3,7 +3,7 @@ class NetworkService {
         this.socket = null,
             this.isConnected = false,
             this.reconnectInterval = null,
-            this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=d796da2cfe32d665e38a98d74be4738679e94086'
+            this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=48bc00a816650d065fef08fcd45d2c1d11b63e5e'
         this.events = new Phaser.Events.EventEmitter()
     }
 

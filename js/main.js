@@ -33,6 +33,10 @@ function init() {
         },
         dom: {
             createContainer: true
+        },
+        fps: {
+            target: 60,
+            forceSetTimeOut: true
         }
     }
 
