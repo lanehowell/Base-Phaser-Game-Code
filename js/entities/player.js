@@ -110,33 +110,38 @@ export class Player {
     createAnimations() {
         const frameRate = 8
 
-        this.scene.anims.create({
-            key: 'down',
-            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_DOWN, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        })
-
-        this.scene.anims.create({
-            key: 'up',
-            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_UP, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        })
-
-        this.scene.anims.create({
-            key: 'left',
-            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_LEFT, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        })
-
-        this.scene.anims.create({
-            key: 'right',
-            frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_RIGHT, { start: 0, end: 3 }),
-            frameRate: frameRate,
-            repeat: -1,
-        })
+        if (!this.scene.anims.exists('down')) {
+            this.scene.anims.create({
+                key: 'down',
+                frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_DOWN, { start: 0, end: 3 }),
+                frameRate: frameRate,
+                repeat: -1,
+            })
+        }
+        if (!this.scene.anims.exists('up')) {
+            this.scene.anims.create({
+                key: 'up',
+                frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_UP, { start: 0, end: 3 }),
+                frameRate: frameRate,
+                repeat: -1,
+            })
+        }
+        if (!this.scene.anims.exists('left')) {
+            this.scene.anims.create({
+                key: 'left',
+                frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_LEFT, { start: 0, end: 3 }),
+                frameRate: frameRate,
+                repeat: -1,
+            })
+        }
+        if (!this.scene.anims.exists('right')) {
+            this.scene.anims.create({
+                key: 'right',
+                frames: this.scene.anims.generateFrameNumbers(SPRITE_KEYS.PLAYER_RIGHT, { start: 0, end: 3 }),
+                frameRate: frameRate,
+                repeat: -1,
+            })
+        }
     }
 
     // Set up keybinds for player
@@ -156,7 +161,7 @@ export class Player {
 
     // Add collions for portals on the map
     setupPortals(portals) {
-        this.scene.physics.add.collider(this.sprite, portals, function(player, portal){
+        this.scene.physics.add.collider(this.sprite, portals, function (player, portal) {
             networkService.sendTeleportRequest(portal.name)
         })
     }

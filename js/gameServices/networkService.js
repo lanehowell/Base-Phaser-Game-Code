@@ -3,7 +3,7 @@ class NetworkService {
         this.socket = null,
             this.isConnected = false,
             this.reconnectInterval = null,
-            this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=48bc00a816650d065fef08fcd45d2c1d11b63e5e'
+            this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=d796da2cfe32d665e38a98d74be4738679e94086'
         this.events = new Phaser.Events.EventEmitter()
     }
 
@@ -89,7 +89,6 @@ class NetworkService {
     }
 
     handleMessage(message) {
-        // console.log(`WebSocket Message Received: `, message)
 
         this.events.emit('message', message)
 
@@ -100,6 +99,7 @@ class NetworkService {
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
         switch (message.p) {
             case 'init_packet':
+                this.events.emit('mapChanged', message.d)
                 this.initialPlayers = message.d.players
                 this.map = message.d.map
                 break
@@ -117,8 +117,13 @@ class NetworkService {
                 break
             case 'chat':
                 this.events.emit('chatReceived', message.d)
+                break
+            case 'time':
+                this.events.emit('timeChanged', message.d)
+                break
             default:
                 console.log(message)
+                break
         }
 
     }

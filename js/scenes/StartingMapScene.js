@@ -4,6 +4,7 @@ import { SCENE_KEYS } from "./SceneKeys.js";
 import playerDataService from "../gameServices/playerDataService.js";
 import { BaseScene } from "./baseScene.js";
 import { MapEditSystem } from "../utilityClasses/mapEditSystem.js";
+import networkService from "../gameServices/networkService.js";
 
 export class StartingMapScene extends BaseScene {
     constructor() {
@@ -16,8 +17,31 @@ export class StartingMapScene extends BaseScene {
     init(data) {
         this.mapId = data.mapId
 
-        playerDataService.events.on('skillLevelUp', this.handleSkillLevelUp, this);
-        // playerDataService.events.on('inventoryChanged', this.updateInventoryUI, this);
+        playerDataService.events.on('skillLevelUp', this.handleSkillLevelUp, this)
+        // playerDataService.events.on('inventoryChanged', this.updateInventoryUI, this)
+
+        networkService.events.on('mapChanged', this.handleMapChange, this)
+    }
+
+    handleMapChange(mapData) {
+
+        console.log("Map change: New Map: ", mapData)
+        this.cleanupScene()
+        this.scene.restart({ mapId: SCENE_KEYS.STARTING_MAP_SCENE })
+
+    }
+
+    cleanupScene() {
+
+        this.player.destroy()
+
+        this.cleanupNetworkPlayers()
+
+        this.networkPlayerManager.cleanup()
+
+        playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this)
+        networkService.events.off('mapChanged', this.handleMapChange, this)
+
     }
 
     handleSkillLevelUp(data) {
@@ -55,11 +79,11 @@ export class StartingMapScene extends BaseScene {
 
     update() {
 
-        if(this.player){ 
+        if (this.player) {
             this.player.update()
         }
 
-        if(this.networkPlayerManager){
+        if (this.networkPlayerManager) {
             this.networkPlayerManager.update()
         }
 

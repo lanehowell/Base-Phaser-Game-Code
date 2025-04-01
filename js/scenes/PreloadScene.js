@@ -3,14 +3,15 @@
 import { MAP_KEYS } from "../../assets/maps/mapKeys.js";
 import { TILESET_KEYS } from "../../assets/maps/tilesets/tilesetKeys.js";
 import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js";
+import networkService from "../gameServices/networkService.js";
 import { SCENE_KEYS } from "./SceneKeys.js";
 
-export class PreloadScene extends Phaser.Scene {    
-    constructor(map) {
+export class PreloadScene extends Phaser.Scene {
+    constructor() {
         super({
             key: SCENE_KEYS.PRELOAD_SCENE
         })
-        this.map = map
+        this.map = networkService.map
     }
 
     preload() {

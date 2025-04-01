@@ -7,13 +7,13 @@ export class BaseScene extends Phaser.Scene {
         this.player = new Player(this, mapId)
 
         // @ts-ignore
-        if(this.barriers){
+        if (this.barriers) {
             // @ts-ignore
             this.player.setupCollisions(this.barriers)
             this.player.setupControls()
         }
         // @ts-ignore
-        if(this.portals){
+        if (this.portals) {
             // @ts-ignore
             this.player.setupPortals(this.portals)
         }
@@ -35,7 +35,7 @@ export class BaseScene extends Phaser.Scene {
         this.networkCollisionsTimer = this.time.addEvent({
             delay: 1000,
             callback: () => {
-                if(this.networkPlayerCollider){
+                if (this.networkPlayerCollider) {
                     this.networkPlayerCollider.destroy()
                 }
 
@@ -56,4 +56,20 @@ export class BaseScene extends Phaser.Scene {
             this.networkPlayerCollider.destroy()
         }
     }
+
+    cleanupNetworkPlayers() {
+
+        if (this.networkPlayerManager) {
+            const players = this.networkPlayerManager.players;
+            if (players && players.size > 0) {
+                players.forEach(player => {
+                    if (player && player.destroy) {
+                        player.destroy()
+                    }
+                })
+                players.clear()
+            }
+        }
+    }
+
 }

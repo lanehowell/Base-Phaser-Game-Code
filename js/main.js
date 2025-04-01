@@ -5,17 +5,16 @@ import { UIScene } from "./scenes/UIScene.js";
 
 //Initialize WebSocket Connection
 networkService.connect();
-setTimeout(init, 10000);
+setTimeout(init, 1000);
+// init()
 function init() {
-    // @ts-ignore
-    PreloadScene.map = networkService.map;
     //Game Config
     const config = {
         type: Phaser.AUTO,
         width: '100%',
         height: '100%',
         parent: 'canvas',
-        scene: [new PreloadScene(networkService.map), StartingMapScene, UIScene],
+        scene: [new PreloadScene, StartingMapScene, UIScene],
         scale: {
             mode: Phaser.Scale.RESIZE
         },

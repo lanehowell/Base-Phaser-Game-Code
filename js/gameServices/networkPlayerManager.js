@@ -9,21 +9,48 @@ export class NetworkPlayerManager {
     this.players = new Map()
     this.localPlayerId = playerDataService.data.id
 
+    this.cleanup()
+
     this.setupNetworkListeners()
     this.loadExistingPlayers()
+  }
+
+  cleanup() {
+    if (this.players) {
+      this.players.forEach(player => {
+        if (player && player.destroy) {
+          player.destroy()
+        }
+      })
+      this.players.clear()
+    }
+
+    if (networkService.events) {
+      networkService.events.off('playerJoined', this.handlePlayerJoined, this)
+      networkService.events.off('playerMoved', this.handlePlayerMove, this)
+      networkService.events.off('playerLeft', this.handlePlayerLeft, this)
+      networkService.events.off('chatReceived', this.handleChatReceived, this)
+    }
   }
 
   loadExistingPlayers() {
 
     networkService.initialPlayers.forEach(player => {
       // Server handles filtering out local player
-      const newPlayer = new NetworkPlayer(this.scene, player.id, player.position.x, player.position.y, player.position.direction, player.name)
-      this.players.set(newPlayer.id, newPlayer)
+      if (!playerDataService.data.id === player.id) {
+        const newPlayer = new NetworkPlayer(this.scene, player.id, player.position.x, player.position.y, player.position.direction, player.name)
+        this.players.set(newPlayer.id, newPlayer)
+      }
     })
 
   }
 
   setupNetworkListeners() {
+
+    this.handlePlayerJoined = this.handlePlayerJoined.bind(this)
+    this.handlePlayerMove = this.handlePlayerMove.bind(this)
+    this.handlePlayerLeft = this.handlePlayerLeft.bind(this)
+    this.handleChatReceived = this.handleChatReceived.bind(this)
 
     networkService.events.on('playerJoined', (playerData) => {
       this.handlePlayerJoined(playerData)
