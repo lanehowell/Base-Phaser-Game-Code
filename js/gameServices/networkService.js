@@ -99,7 +99,8 @@ class NetworkService {
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
         switch (message.p) {
             case 'init_packet':
-                this.events.emit('mapChanged', message.d)
+                console.log('Map Change Packet: ', message.d)
+                this.events.emit('mapChanged', message.d.map)
                 this.initialPlayers = message.d.players
                 this.map = message.d.map
                 break
@@ -185,7 +186,6 @@ class NetworkService {
                 p: "teleport",
                 d: portalName
             })
-            console.log(message)
             this.socket.send(message)
 
 

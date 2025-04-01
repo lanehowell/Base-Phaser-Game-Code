@@ -5,6 +5,7 @@ import playerDataService from "../gameServices/playerDataService.js";
 import { BaseScene } from "./baseScene.js";
 import { MapEditSystem } from "../utilityClasses/mapEditSystem.js";
 import networkService from "../gameServices/networkService.js";
+import { fadeTransition } from "../utilityClasses/sceneTransition.js";
 
 export class StartingMapScene extends BaseScene {
     constructor() {
@@ -25,24 +26,15 @@ export class StartingMapScene extends BaseScene {
 
     handleMapChange(mapData) {
 
-        console.log("Map change: New Map: ", mapData)
-        this.cleanupScene()
-        this.scene.restart({ mapId: SCENE_KEYS.STARTING_MAP_SCENE })
+        fadeTransition()
+        setTimeout(() => {
+            this.shutdown()
+            this.scene.start(SCENE_KEYS.PRELOAD_SCENE)
+            console.log("Map change: New Map: ", mapData)
+        }, 750)
 
     }
 
-    cleanupScene() {
-
-        this.player.destroy()
-
-        this.cleanupNetworkPlayers()
-
-        this.networkPlayerManager.cleanup()
-
-        playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this)
-        networkService.events.off('mapChanged', this.handleMapChange, this)
-
-    }
 
     handleSkillLevelUp(data) {
         // Show level up notification
@@ -122,7 +114,6 @@ export class StartingMapScene extends BaseScene {
         this.portals = this.physics.add.group({ immovable: true })
         this.portalObjects = this.map.getObjectLayer('Portals').objects
         this.portalObjects.forEach((portalObject) => {
-            console.log(portalObject)
             const portal = this.physics.add.sprite(
                 portalObject.x + (portalObject.width / 2),
                 portalObject.y + (portalObject.height / 2),
@@ -166,7 +157,7 @@ export class StartingMapScene extends BaseScene {
     }
 
     shutdown() {
-        this.cleanupNetworkCollisions()
-        playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this);
+        playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this)
+        this.player.destroy()
     }
 }
