@@ -16,6 +16,10 @@ export class PreloadScene extends Phaser.Scene {
 
     preload() {
 
+        console.log("====================")
+        console.log("     PRELOAD")
+        console.log("====================")
+
         const spritesPath = 'assets/sprites'
         const mapsPath = 'assets/maps'
         const frameSize = { frameWidth: 192 / 4, frameHeight: 192 / 3 }

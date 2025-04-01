@@ -18,6 +18,10 @@ export class StartingMapScene extends BaseScene {
     init(data) {
         this.mapId = data.mapId
 
+        console.log("====================")
+        console.log("  STARTING SCENE")
+        console.log("====================")
+
         playerDataService.events.on('skillLevelUp', this.handleSkillLevelUp, this)
         // playerDataService.events.on('inventoryChanged', this.updateInventoryUI, this)
 
@@ -30,7 +34,7 @@ export class StartingMapScene extends BaseScene {
         setTimeout(() => {
             this.shutdown()
             this.scene.start(SCENE_KEYS.PRELOAD_SCENE)
-            console.log("Map change: New Map: ", mapData)
+            console.log("Map change: ", mapData)
         }, 750)
 
     }
@@ -102,14 +106,12 @@ export class StartingMapScene extends BaseScene {
                 barrierObject.y + (barrierObject.height / 2),
                 null
             )
-
             barrier.setSize(barrierObject.width, barrierObject.height)
-
             barrier.setVisible(false)
-
             barrier.setImmovable(true)
             this.barriers.add(barrier)
         })
+
         //Set up portals
         this.portals = this.physics.add.group({ immovable: true })
         this.portalObjects = this.map.getObjectLayer('Portals').objects
@@ -159,5 +161,7 @@ export class StartingMapScene extends BaseScene {
     shutdown() {
         playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this)
         this.player.destroy()
+        this.networkPlayerManager.cleanup()
+        networkService.events.off('mapChanged', this.handleMapChange, this)
     }
 }

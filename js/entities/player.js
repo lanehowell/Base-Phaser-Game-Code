@@ -161,8 +161,9 @@ export class Player {
 
     // Add collions for portals on the map
     setupPortals(portals) {
-        this.scene.physics.add.collider(this.sprite, portals, function (player, portal) {
+        this.scene.physics.add.collider(this.sprite, portals, (player, portal) => {
             networkService.sendTeleportRequest(portal.name)
+            this.sprite.setVelocity(0, 0)
         })
     }
 

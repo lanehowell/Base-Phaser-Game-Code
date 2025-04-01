@@ -85,7 +85,9 @@ export class NetworkPlayer {
   }
 
   stopAnimation() {
-    this.sprite.anims.stop()
+    if(this.sprite.anims){
+      this.sprite.anims.stop()
+    }
   }
 
   updatePosition(x, y, direction) {
