@@ -1,6 +1,5 @@
 // PRELOAD SCENE HANDLES LOADING OF ALL ASSETS NEEDED FOR GAME
 
-import { MAP_KEYS } from "../../assets/maps/mapKeys.js";
 import { TILESET_KEYS } from "../../assets/maps/tilesets/tilesetKeys.js";
 import { SPRITE_KEYS } from "../../assets/sprites/spriteKeys.js";
 import networkService from "../gameServices/networkService.js";
@@ -12,12 +11,25 @@ export class PreloadScene extends Phaser.Scene {
             key: SCENE_KEYS.PRELOAD_SCENE
         })
         this.map = networkService.map
+        this.mapName = this.map.properties[0].value
+        
+    }
+    
+    init() {
+        this.map = networkService.map
+        this.mapName = this.map.properties[0].value
+        
+        // Clear any existing tilemap from cache
+        if (this.cache.tilemap.exists(this.mapName)) {
+            this.cache.tilemap.remove(this.mapName);
+        }
     }
 
     preload() {
 
         console.log("====================")
         console.log("     PRELOAD")
+        console.log(this.map.properties[0].value)
         console.log("====================")
 
         const spritesPath = 'assets/sprites'
@@ -32,7 +44,8 @@ export class PreloadScene extends Phaser.Scene {
 
         // Load Map Assets
         this.load.image(TILESET_KEYS.BEACH_TILESET, `${mapsPath}/tilesets/beach_tiles.png`)
-        this.load.tilemapTiledJSON(MAP_KEYS.STARTING_MAP, this.map)
+        console.log(this.mapName, this.map)
+        this.load.tilemapTiledJSON(this.mapName, this.map)
 
         // Load UI Elements
         this.load.image('UIHeart', 'assets/ui/heart.png')
@@ -45,7 +58,7 @@ export class PreloadScene extends Phaser.Scene {
 
     create() {
 
-        this.scene.start(SCENE_KEYS.STARTING_MAP_SCENE, { mapId: MAP_KEYS.STARTING_MAP })
+        this.scene.start(SCENE_KEYS.STARTING_MAP_SCENE,  this.mapName)
 
     }
 }

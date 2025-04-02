@@ -6,7 +6,6 @@ import { UIScene } from "./scenes/UIScene.js";
 //Initialize WebSocket Connection
 networkService.connect();
 setTimeout(init, 1000);
-// init()
 function init() {
     //Game Config
     const config = {

@@ -1,10 +1,11 @@
 class NetworkService {
     constructor() {
         this.socket = null,
-            this.isConnected = false,
-            this.reconnectInterval = null,
-            this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=48bc00a816650d065fef08fcd45d2c1d11b63e5e'
+        this.isConnected = false,
+        this.reconnectInterval = null,
+        this.serverURL = 'wss://pine.candl.pro/ws/testsocket/?token=48bc00a816650d065fef08fcd45d2c1d11b63e5e'
         this.events = new Phaser.Events.EventEmitter()
+        this.map = null
     }
 
     connect() {
@@ -99,10 +100,11 @@ class NetworkService {
         // HANDLE LOGIC FOR TYPES OF MESSAGES AND WHAT TO DO WITH THEM
         switch (message.p) {
             case 'init_packet':
+                this.map = message.d.map
+                console.log(this.map)
                 console.log('Map Change Packet: ', message.d)
                 this.events.emit('mapChanged', message.d.map)
                 this.initialPlayers = message.d.players
-                this.map = message.d.map
                 break
             case 'self':
                 this.events.emit('playerDataReceived', message.d)

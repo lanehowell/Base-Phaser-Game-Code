@@ -16,7 +16,7 @@ export class StartingMapScene extends BaseScene {
     }
 
     init(data) {
-        this.mapId = data.mapId
+        this.mapId = data
 
         console.log("====================")
         console.log("  STARTING SCENE")
@@ -56,7 +56,7 @@ export class StartingMapScene extends BaseScene {
         this.input.mouse.disableContextMenu()
         this.createMap()
 
-        this.createPlayer(MAP_KEYS.STARTING_MAP)
+        this.createPlayer(this.mapId)
         this.setupNetworkPlayerManager() // Base Scene
 
         this.mapEditSystem = new MapEditSystem(this)
@@ -88,7 +88,7 @@ export class StartingMapScene extends BaseScene {
     createMap() {
 
         // Load Tilemap
-        this.map = this.make.tilemap({ key: MAP_KEYS.STARTING_MAP, tileHeight: 16, tileWidth: 16 });
+        this.map = this.make.tilemap({ key: this.mapId, tileHeight: 16, tileWidth: 16 })
 
         const beach_tiles = this.map.addTilesetImage('beach_tiles', TILESET_KEYS.BEACH_TILESET)
         const water_layer = this.map.createLayer('Water Layer', beach_tiles, 0, 0)
@@ -96,6 +96,8 @@ export class StartingMapScene extends BaseScene {
         this.ground_layer.setInteractive()
         this.paths_layer = this.map.createLayer('Paths Layer', beach_tiles, 0, 0)
         this.paths_layer.setInteractive()
+
+        console.log(this.map)
 
         //Set up barriers
         this.barriers = this.physics.add.group({ immovable: true })
@@ -161,6 +163,7 @@ export class StartingMapScene extends BaseScene {
     shutdown() {
         playerDataService.events.off('skillLevelUp', this.handleSkillLevelUp, this)
         this.player.destroy()
+        this.map.destroy()
         this.networkPlayerManager.cleanup()
         networkService.events.off('mapChanged', this.handleMapChange, this)
     }
