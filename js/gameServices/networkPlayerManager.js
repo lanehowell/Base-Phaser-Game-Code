@@ -1,7 +1,6 @@
 import { NetworkPlayer } from "../entities/networkPlayer.js"
 import networkService from "./networkService.js"
 import playerDataService from "./playerDataService.js"
-import { Player } from "../entities/player.js"
 
 export class NetworkPlayerManager {
   constructor(scene) {
@@ -18,7 +17,7 @@ export class NetworkPlayerManager {
   cleanup() {
     if (this.players) {
       this.players.forEach(player => {
-        if (player && player.destroy) {
+        if (player) {
           player.destroy()
         }
       })
@@ -36,7 +35,6 @@ export class NetworkPlayerManager {
   loadExistingPlayers() {
 
     networkService.initialPlayers.forEach(player => {
-      // Server handles filtering out local player
       if (!playerDataService.data.id === player.id) {
         const newPlayer = new NetworkPlayer(this.scene, player.id, player.position.x, player.position.y, player.position.direction, player.name)
         this.players.set(newPlayer.id, newPlayer)

@@ -169,7 +169,7 @@ export class Player {
 
     showMessageBubble(message) {
 
-        this.cleanupChatBubble(false);
+        this.cleanupChatBubble(false)
 
         if (!this.chatBubble) {
             this.chatBubble = this.scene.add.container(this.sprite.x, this.sprite.y - (this.sprite.height * 0.5));

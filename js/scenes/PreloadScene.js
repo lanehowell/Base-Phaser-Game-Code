@@ -30,7 +30,6 @@ export class PreloadScene extends Phaser.Scene {
         console.log("====================")
         console.log("     PRELOAD")
         console.log(this.map.properties[0].value)
-        console.log("====================")
 
         const spritesPath = 'assets/sprites'
         const mapsPath = 'assets/maps'
@@ -53,6 +52,8 @@ export class PreloadScene extends Phaser.Scene {
 
         // Load Bitmap Fonts
         this.load.bitmapFont('Pixeled', 'assets/fonts/thick.png', 'assets/fonts/thick.xml')
+
+        console.log("====================")
 
     }
 
